@@ -1,0 +1,27 @@
+name: Twitch Extension Bundle
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  twitch-extension:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v7
+    - uses: pnpm/setup@v2
+      with:
+        runtime: node@lts
+        cache: true
+
+    - name: Build Twitch Extension
+      run: node --run build:extension
+
+    - name: Upload Bundle 📤
+      uses: actions/upload-artifact@v7
+      with:
+        path: .output/extension.zip
+        retention-days: 1
+        archive: false

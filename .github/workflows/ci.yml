@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  NODE_OPTIONS: --max-old-space-size=6144
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+jobs:
+  lint:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/setup@v2
+        with:
+          runtime: node@lts
+          cache: true
+
+      - name: 🔎 Lint
+        run: node --run lint
+
+  test:
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v7
+        - uses: pnpm/setup@v2
+          with:
+            runtime: node@lts
+            cache: true
+
+      # - name: 🧪 Run test suite
+      #   run: node --run test
+
+        - name: 🧪 Test types
+          run: node --run test:types
