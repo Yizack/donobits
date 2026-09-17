@@ -1,4 +1,4 @@
-name: Twitch Extension Bundle
+name: twitch-extension
 
 on:
   push:
