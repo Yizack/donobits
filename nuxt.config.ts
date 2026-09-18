@@ -18,6 +18,10 @@ export default defineNuxtConfig({
       }
     },
 
+    ui: {
+      prose: true
+    },
+
     routeRules: {
       "/panel.html": { proxy: "/extension/panel" },
       "/config.html": { proxy: "/extension/config" }
