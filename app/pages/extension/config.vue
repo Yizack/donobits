@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { HelixUser } from "@twurple/api";
+
 const form = ref({
   donoclip: ""
 });
@@ -7,11 +9,12 @@ const twitch = useTwitch();
 
 const isAuthorized = ref(false);
 
-const broadcasterLogin = ref();
+const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
 const loading = ref(false);
 const showDonoclipInstructions = ref(false);
 const importError = ref("");
 
+const broadcasterLogin = computed(() => broadcaster.value?.name);
 const { data, status, execute } = await useDonoclip(broadcasterLogin);
 
 const importDonoclip = () => {
@@ -33,10 +36,10 @@ const importDonoclip = () => {
 };
 
 onMounted(async () => {
-  Twitch.ext.onAuthorized(async ({ clientId, channelId }) => {
+  Twitch.ext.onAuthorized(async (auth) => {
     isAuthorized.value = true;
-    twitch.init(clientId);
-    broadcasterLogin.value = await twitch.getUserLoginById(channelId);
+    twitch.init(auth.clientId);
+    broadcaster.value = await twitch.getUserById(auth.channelId);
     await execute();
   });
 });

@@ -29,7 +29,7 @@ const purchase = async (clipId: number) => {
 
   if (!await twitch.isLive(broadcaster.value.id)) {
     purchasingId.value = null;
-    errorText.value = "The broadcaster is not live";
+    errorText.value = `${broadcaster.value.displayName} is not live`;
     return;
   }
 
@@ -37,15 +37,15 @@ const purchase = async (clipId: number) => {
 };
 
 onMounted(() => {
-  Twitch.ext.onAuthorized(async ({ clientId, channelId }) => {
+  Twitch.ext.onAuthorized(async (auth) => {
     isAuthorized.value = true;
     bitsEnabled.value = Twitch.ext.features.isBitsEnabled;
-    twitch.init(clientId);
+    twitch.init(auth.clientId);
 
     bitsLoading.value = true;
     errorText.value = null;
 
-    broadcaster.value = await twitch.getUserById(channelId);
+    broadcaster.value = await twitch.getUserById(auth.channelId);
 
     Twitch.ext.bits.getProducts().then((products) => {
       bitsProduct.value = products.find(product => SITE.twitch.extension.products.includes(product.sku)) ?? null;
@@ -149,7 +149,20 @@ const filteredClips = computed(() => {
       </template>
     </UHeader>
 
-    <UAlert v-if="errorText" class="sticky top-16 z-50 shadow" color="error" :description="errorText" icon="pixelarticons:alert" />
+    <UAlert
+      v-if="errorText"
+      class="sticky top-16 z-50 shadow"
+      color="error"
+      :description="errorText"
+      icon="pixelarticons:alert"
+      :close="{
+        variant: 'solid',
+        class: 'rounded-full',
+        onClick: () => {
+          errorText = null
+        },
+      }"
+    />
 
     <UContainer class="py-2">
       <ClientOnly>
