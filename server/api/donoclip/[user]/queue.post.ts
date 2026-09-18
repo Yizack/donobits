@@ -17,8 +17,6 @@ export default defineEventHandler(async (event) => {
     })
   }).parse);
 
-  // TODO: validate transaction
-
   const params = await getValidatedRouterParams(event, z.object({
     user: z.string().min(1)
   }).parse);
@@ -55,6 +53,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Durable Object service unavailable"
     });
   }
+
+  // TODO: validate transaction
 
   const publishResponse = await durableFetch(
     new Request(SITE.host + event.path, {

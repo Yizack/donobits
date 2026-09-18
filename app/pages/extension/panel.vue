@@ -134,25 +134,12 @@ const filteredClips = computed(() => {
     </UHeader>
     <UContainer class="py-2">
       <ClientOnly>
-        <p class="text-sm text-muted mb-5 text-center">
-          Showing {{ filteredClips.length }} of {{ data?.length ?? 0 }} clips
+        <p class="text-sm text-muted mt-2 mb-3 text-center">
+          <span v-if="filteredClips.length === (data?.length ?? 0)">{{ filteredClips.length }} clips</span>
+          <span v-else>Showing {{ filteredClips.length }} of {{ data?.length ?? 0 }} clips</span>
         </p>
-        <div v-if="status === 'pending'" class="grid gap-5 grid-cols-2">
-          <UCard v-for="placeholder in 4" :key="placeholder" variant="subtle">
-            <div class="space-y-5 animate-pulse">
-              <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="size-10 rounded-full bg-elevated" />
-                  <div class="space-y-2">
-                    <div class="h-3 w-16 rounded bg-elevated" />
-                    <div class="h-4 w-28 rounded bg-elevated" />
-                  </div>
-                </div>
-                <div class="h-6 w-20 rounded-full bg-elevated" />
-              </div>
-              <div class="h-10 rounded-lg bg-elevated" />
-            </div>
-          </UCard>
+        <div v-if="status === 'idle' || status === 'pending'" class="grid gap-5 grid-cols-2 md:grid-cols-4">
+          <ClipCardSkeleton v-for="placeholder in 4" :key="placeholder" />
         </div>
 
         <UCard v-else-if="error" variant="subtle" class="border-error/30">
@@ -175,6 +162,7 @@ const filteredClips = computed(() => {
           v-else-if="filteredClips.length"
           class="grid gap-5 grid-cols-2 md:grid-cols-4"
         >
+          <ClipCardSkeleton />
           <ClipCard
             v-for="clip in filteredClips"
             :key="clip.UUID"

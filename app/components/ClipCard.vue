@@ -98,6 +98,11 @@ watch(isPlaying, (isPlaying) => {
         @click="togglePlayback"
       >
         <Icon
+          v-if="isPlaying"
+          name="pixelarticons:pause"
+          class="absolute animate-ping size-15 transition-transform group-hover:scale-110"
+        />
+        <Icon
           :name="isPlaying ? 'pixelarticons:pause' : 'pixelarticons:play'"
           class="size-20 transition-transform group-hover:scale-110"
         />
@@ -126,14 +131,15 @@ watch(isPlaying, (isPlaying) => {
           variant="soft"
           size="lg"
           icon="twitch:cheer"
+          class="group"
+          :ui="{ leadingIcon: 'group-hover:scale-120 transition-transform' }"
+          title="Click to purchase"
           :loading="loading"
           :disabled="disabled || loading"
+          :label="price ?? 'Free'"
           block
           @click="emit('click')"
-        >
-          <span v-if="price">{{ price }}</span>
-          <span v-else>Free</span>
-        </UButton>
+        />
       </div>
     </template>
   </UCard>
