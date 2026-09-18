@@ -3,6 +3,8 @@ import { useWebSocket } from "@vueuse/core";
 
 const route = useRoute("source");
 const user = route.query.user?.toString();
+const localMode = import.meta.dev;
+
 if (!user) {
   throw createError({
     status: 400,
@@ -11,48 +13,45 @@ if (!user) {
   });
 }
 
-const queued = ref<(DonobitsQueue & { queueId: number })[]>([]);
+const queued = ref<DonoBitsQueueItem[]>([]);
+const addToQueue = (queue: DonobitsQueue) => queued.value.push({ ...queue, queueId: nextQueueId++ });
 let nextQueueId = 0;
 
 const testLoading = ref(false);
 const testError = ref("");
 const current = computed(() => queued.value[0] ?? null);
 
-const player = ref<HTMLMediaElement>();
-
-watch(current, () => {
-  nextTick(async () => {
-    await player.value?.play().catch(() => {});
-  });
-});
-
 /* test user */
 const testUser = "yizack";
-const testClipId = 1443902;
-const { data: testClips, execute: loadTestClips } = await useDonoclip(testUser);
 
 const queueTestClip = async () => {
-  testLoading.value = true;
-  testError.value = "";
-
-  if (!testClips.value) await loadTestClips();
-  const clip = testClips.value?.find(item => item.ID === testClipId);
-
-  $fetch(`/api/donoclip/${testUser}/queue`, {
-    method: "POST",
-    body: {
-      clip
+  addToQueue({
+    transaction: {
+      displayName: "Local test",
+      product: {
+        cost: {
+          amount: "100",
+          type: "bits"
+        }
+      }
+    },
+    avatar: "https://static-cdn.jtvnw.net/jtv_user_pictures/4f6e670e-fcbb-44f4-92a6-7340a86227d1-profile_image-300x300.png",
+    clip: {
+      ID: 1443902,
+      UUID: "b9bf27e6-308a-4c68-97f6-dad62843b975",
+      Type: "audio",
+      ViewerName: "TifannyMusso",
+      UploadedAt: 1789436673296,
+      ModDecision: 2,
+      AssetUrl: "https://donoclip-assets-994b4a9.s3.eu-central-1.amazonaws.com/jimrsng/b9bf27e6-308a-4c68-97f6-dad62843b975.webm"
     }
-  }).catch((error) => {
-    console.error("Failed to queue test clip:", error);
-    testError.value = "Failed to queue test clip";
-  }).finally(() => {
-    testLoading.value = false;
   });
 };
 /* end test user */
 
 onMounted(() => {
+  if (localMode) return;
+
   useWebSocket(`/ws/source?user=${encodeURIComponent(user)}`, {
     autoReconnect: true,
     onMessage: async (ws, event) => {
@@ -64,7 +63,7 @@ onMounted(() => {
 
       switch (message.type) {
         case "queued":
-          queued.value.push({ ...message.data, queueId: nextQueueId++ });
+          addToQueue(message.data);
           break;
       }
     }
@@ -73,26 +72,23 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <audio
+  <main>
+    <AudioVisualizer
       v-if="current?.clip.Type === 'audio'"
-      ref="player"
       :key="`audio-${current.queueId}`"
-      :src="current.clip.AssetUrl"
-      autoplay
+      :item="current"
       @ended="queued.shift()"
     />
     <video
       v-else-if="current?.clip.Type === 'video'"
-      ref="player"
       :key="`video-${current.queueId}`"
       :src="current.clip.AssetUrl"
       autoplay
       @ended="queued.shift()"
     />
-    <div v-if="user === testUser" class="fixed bottom-4 left-4">
+    <div v-if="localMode && user === testUser" class="fixed bottom-4 left-4">
       <UButton
-        label="Test clip"
+        label="Play local test"
         icon="pixelarticons:play"
         :loading="testLoading"
         @click="queueTestClip"
@@ -101,5 +97,5 @@ onMounted(() => {
         {{ testError }}
       </p>
     </div>
-  </div>
+  </main>
 </template>

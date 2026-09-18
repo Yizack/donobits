@@ -17,10 +17,12 @@ export default defineEventHandler(async (event) => {
     })
   }).parse);
 
-  if (!await isValidTwitchTransaction(event, body.transaction)) {
+  const payload = await validateTwitchTransaction(event, body.transaction);
+
+  if (!payload) {
     throw createError({
-      statusCode: 400,
-      statusMessage: "Invalid Twitch transaction"
+      status: 400,
+      message: "Invalid Twitch transaction"
     });
   }
 
@@ -41,7 +43,13 @@ export default defineEventHandler(async (event) => {
         type: "queued",
         data: {
           transaction: {
-            displayName: body.transaction?.displayName
+            displayName: body.transaction.displayName,
+            product: {
+              cost: {
+                amount: String(payload.data.product.cost.amount),
+                type: payload.data.product.cost.type
+              }
+            }
           },
           avatar: body.avatar,
           clip: body.clip
@@ -56,8 +64,8 @@ export default defineEventHandler(async (event) => {
   const durableFetch = event.context.cloudflare?.durableFetch;
   if (!durableFetch) {
     throw createError({
-      statusCode: 503,
-      statusMessage: "Durable Object service unavailable"
+      status: 503,
+      message: "Durable Object service unavailable"
     });
   }
 
@@ -75,8 +83,8 @@ export default defineEventHandler(async (event) => {
 
   if (!publishResponse.ok) {
     throw createError({
-      statusCode: 502,
-      statusMessage: "Failed to publish queued clip"
+      status: 502,
+      message: "Failed to publish queued clip"
     });
   }
 

@@ -6,5 +6,6 @@ export default [
   "pixelarticons:clipboard",
   "pixelarticons:clipboard-note",
   "pixelarticons:close",
-  "pixelarticons:alert"
+  "pixelarticons:alert",
+  "pixelarticons:shopping-cart"
 ];

@@ -24,7 +24,7 @@ const parseTwitchTime = (value: string): Date => {
 
 const TOLERANCE_MINUTES = 1;
 
-export const isValidTwitchTransaction = async (
+export const validateTwitchTransaction = async (
   event: H3Event,
   transaction: Pick<Twitch.ext.BitsTransaction, "displayName" | "transactionReceipt">
 ) => {
@@ -39,13 +39,15 @@ export const isValidTwitchTransaction = async (
     const transactionTime = parseTwitchTime(payload.data.time);
     const age = Date.now() - transactionTime.getTime();
 
-    return (payload.topic === "bits_transaction_receipt"
+    if (payload.topic === "bits_transaction_receipt"
       && payload.data.product.domainId === `twitch.ext.${twitch.twitch.extension.clientId}`
       && payload.data.product.cost.type === "bits"
       && age < TOLERANCE_MINUTES * 60 * 1000
-    );
+    ) {
+      return payload;
+    }
   }
   catch {
-    return false;
+    return null;
   }
 };

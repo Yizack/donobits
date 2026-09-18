@@ -97,12 +97,12 @@ watch(isPlaying, (isPlaying) => {
         :aria-label="isPlaying ? `Stop clip from ${clip.ViewerName}` : `Play clip from ${clip.ViewerName}`"
         @click="togglePlayback"
       >
-        <Icon
+        <UIcon
           v-if="isPlaying"
           name="pixelarticons:pause"
           class="absolute animate-ping size-15 transition-transform group-hover:scale-110"
         />
-        <Icon
+        <UIcon
           :name="isPlaying ? 'pixelarticons:pause' : 'pixelarticons:play'"
           class="size-20 transition-transform group-hover:scale-110"
         />
