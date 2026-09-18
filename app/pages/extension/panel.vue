@@ -10,6 +10,7 @@ const avatars = ref<Record<string, string>>({});
 const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
 
 const authorization = ref<Twitch.ext.Authorized | null>(null);
+const isAuthorized = ref(false);
 const errorText = ref<string | null>(null);
 const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
@@ -39,6 +40,7 @@ const purchase = async (clipId: number) => {
 onMounted(() => {
   Twitch.ext.onAuthorized(async (auth) => {
     authorization.value = auth;
+    isAuthorized.value = true;
     bitsEnabled.value = Twitch.ext.features.isBitsEnabled;
     twitch.init(auth.clientId);
 
@@ -101,14 +103,14 @@ onMounted(() => {
 const broadcasterLogin = computed(() => broadcaster.value?.name);
 const { data, error, status, execute } = await useDonoclip(broadcasterLogin);
 
-watch(broadcaster, async () => {
-  if (!broadcaster.value) return;
+watch(broadcasterLogin, async (login, previousLogin) => {
+  if (!login || login === previousLogin) return;
   await execute();
 });
 
-watch([authorization, data], async () => {
+watch([isAuthorized, data], async () => {
   const names = (data.value ?? []).map(clip => clip.ViewerName.toLowerCase());
-  if (authorization.value && names.length) {
+  if (isAuthorized.value && names.length) {
     avatars.value = await twitch.getAvatars(names);
   }
 }, { immediate: true });

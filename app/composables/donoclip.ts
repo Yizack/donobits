@@ -3,6 +3,7 @@ export const useDonoclip = (broadcasterLogin: MaybeRef<string | undefined>) => {
     baseURL: SITE.host,
     server: false,
     lazy: true,
-    immediate: false
+    immediate: false,
+    watch: false
   });
 };
