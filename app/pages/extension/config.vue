@@ -20,13 +20,14 @@ const importDonoclip = () => {
     baseURL: SITE.host,
     method: "POST",
     body: form.value.donoclip
+  }).then(async () => {
+    await execute();
+    form.value.donoclip = "";
+    showDonoclipInstructions.value = false;
   }).catch((error) => {
     console.error("Failed to import donoclip content:", error);
     importError.value = "Failed to import donoclip content";
   }).finally(async () => {
-    form.value.donoclip = "";
-    await execute();
-    showDonoclipInstructions.value = false;
     loading.value = false;
   });
 };
