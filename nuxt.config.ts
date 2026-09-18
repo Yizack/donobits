@@ -143,7 +143,7 @@ export default defineNuxtConfig({
       headers: {
         "Access-Control-Allow-Origin": SITE.twitch.extension.host,
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type"
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
       }
     }
   },
