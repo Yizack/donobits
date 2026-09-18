@@ -47,7 +47,9 @@ onMounted(() => {
     bitsLoading.value = true;
     errorText.value = null;
 
-    broadcaster.value = await twitch.getUserById(auth.channelId);
+    if (!broadcaster.value) {
+      broadcaster.value = await twitch.getUserById(auth.channelId);
+    }
 
     Twitch.ext.bits.getProducts().then((products) => {
       bitsProduct.value = products.find(product => SITE.twitch.extension.products.includes(product.sku)) ?? null;
