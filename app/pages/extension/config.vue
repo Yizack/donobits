@@ -12,7 +12,7 @@ const loading = ref(false);
 const showDonoclipInstructions = ref(false);
 const importError = ref("");
 
-const { data, execute } = await useDonoclip(broadcasterLogin);
+const { data, status, execute } = await useDonoclip(broadcasterLogin);
 
 const importDonoclip = () => {
   loading.value = true;
@@ -58,7 +58,7 @@ const donoclipSnippet = [
       </template>
       <div class="space-y-2">
         <UAlert
-          v-if="data"
+          v-if="data && status === 'success'"
           color="neutral"
           variant="subtle"
           :description="`Imported ${data.length} items`"
@@ -79,11 +79,11 @@ const donoclipSnippet = [
           close
           @update:open="(open) => { if (!open) importError = '' }"
         />
-        <form v-if="broadcasterLogin && (!data || showDonoclipInstructions)" class="space-y-2" @submit.prevent="importDonoclip">
+        <form v-if="broadcasterLogin && (status === 'error' || !data || showDonoclipInstructions)" class="space-y-2" @submit.prevent="importDonoclip">
           <p>Import content from donoclip.com</p>
           <div>
             <ol class="list-decimal list-inside">
-              <li>Go to <ULink :href="`https://www.donoclip.com/${broadcasterLogin}/inbox`" target="_blank" class="hover:underline">https://www.donoclip.com/{{ broadcasterLogin }}/inbox</ULink></li>
+              <li>Go to <ULink :href="`https://www.donoclip.com/${broadcasterLogin}/inbox`" target="_blank" class="underline">https://www.donoclip.com/{{ broadcasterLogin }}/inbox</ULink></li>
               <li>Open the console in your browser by pressing F12</li>
               <li>Paste the following command:<ProsePre language="js">{{ donoclipSnippet }}</ProsePre></li>
               <li>Copy the output from the console and paste it into the field below.</li>
