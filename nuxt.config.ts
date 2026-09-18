@@ -126,7 +126,8 @@ export default defineNuxtConfig({
     "/api/donoclip/**": {
       headers: {
         "Access-Control-Allow-Origin": SITE.twitch.extension.host,
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type"
       }
     }
   },
