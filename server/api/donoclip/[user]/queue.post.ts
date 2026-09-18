@@ -69,8 +69,6 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  // TODO: validate transaction
-
   const publishResponse = await durableFetch(
     new Request(SITE.host + event.path, {
       method: "POST",
