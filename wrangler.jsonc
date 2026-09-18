@@ -15,6 +15,20 @@
     "binding": "ASSETS",
     "directory": ".output/public"
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "$DurableObject",
+        "class_name": "$DurableObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["$DurableObject"]
+    }
+  ],
   "r2_buckets": [
     {
       "binding": "BLOB",

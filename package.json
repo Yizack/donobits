@@ -35,6 +35,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@types/archiver": "^8.0.0",
     "@types/node": "^26.6.1",
     "@types/twitch-ext": "^1.24.9",

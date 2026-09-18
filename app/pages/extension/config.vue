@@ -54,7 +54,7 @@ const donoclipSnippet = [
   <div class="p-1">
     <UCard v-if="isAuthorized">
       <template #header>
-        <img src="~/assets/images/donoclip-logo.svg" alt="DonoClip Logo">
+        <img src="~/assets/images/donoclip-logo.svg" alt="Donoclip Logo">
       </template>
       <div class="space-y-2">
         <UAlert

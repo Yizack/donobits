@@ -8,6 +8,8 @@ const validSku = [
 const broadcasterLogin = ref<string>();
 const avatars = ref<Record<string, string>>({});
 
+const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
+
 const isAuthorized = ref(false);
 const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
@@ -50,10 +52,33 @@ onMounted(() => {
   });
 
   Twitch.ext.bits.onTransactionComplete((transaction) => {
-    if (transaction.initiator === "current_user" && validSku.includes(transaction.product.sku)) {
-      purchasingId.value = null;
-    // TODO: send clip ID to the server for processing
-    }
+    if (transaction.initiator !== "current_user"
+      || !isAuthorized.value
+      || !validSku.includes(transaction.product.sku)
+      || purchasingId.value === null
+      || !broadcasterLogin.value
+    ) return;
+
+    const clip = data.value?.find(item => item.ID === purchasingId.value);
+    if (!clip) return;
+
+    $fetch(`/api/donoclip/${encodeURIComponent(broadcasterLogin.value)}/queue`, {
+      baseURL: SITE.host,
+      method: "POST",
+      body: {
+        transaction: {
+          displayName: transaction.displayName,
+          initiator: transaction.initiator,
+          transactionReceipt: transaction.transactionReceipt
+        },
+        avatar: getViewerAvatar(clip.ViewerName),
+        clip
+      }
+    }).catch((error) => {
+      console.error("Failed to queue clip:", error);
+    });
+
+    purchasingId.value = null;
   });
 
   Twitch.ext.bits.onTransactionCancelled(() => {
@@ -74,8 +99,6 @@ watch([isAuthorized, data], async () => {
     avatars.value = await twitch.getAvatars(names);
   }
 }, { immediate: true });
-
-const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
 
 const viewerSearch = ref("");
 

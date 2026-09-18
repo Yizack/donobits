@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  clip: DonoClip;
+  clip: Donoclip;
   image?: string;
   price?: string;
   disabled: boolean;

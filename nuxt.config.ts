@@ -83,7 +83,7 @@ export default defineNuxtConfig({
 
   $production: {
     nitro: {
-      preset: "cloudflare-module",
+      preset: "cloudflare-durable",
       experimental: {
         websocket: true
       }

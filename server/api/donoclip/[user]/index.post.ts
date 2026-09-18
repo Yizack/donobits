@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
     z.object({
       ID: z.number(),
       UUID: z.uuid(),
-      Type: z.string(),
+      Type: z.enum(["audio", "video"]),
       ViewerName: z.string(),
       UploadedAt: z.number(),
       ModDecision: z.number(),
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     user: z.string()
   }).parse);
 
-  const content = body as DonoClip[];
+  const content = body as Donoclip[];
   const sortedContent = content.sort((a, b) => b.UploadedAt - a.UploadedAt);
 
   await blob.put(params.user, JSON.stringify(sortedContent), {

@@ -1,4 +1,4 @@
-export interface DonoClip {
+export interface Donoclip {
   ID: number;
   UUID: string;
   Type: "audio" | "video";
