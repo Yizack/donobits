@@ -151,13 +151,12 @@ const filteredClips = computed(() => {
 
     <UAlert
       v-if="errorText"
-      class="sticky top-16 z-50 shadow"
+      class="sticky top-16 z-50 shadow py-2"
       color="error"
       :description="errorText"
       icon="pixelarticons:alert"
       :close="{
-        variant: 'solid',
-        class: 'rounded-full',
+        class: 'invert',
         onClick: () => {
           errorText = null
         },
