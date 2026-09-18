@@ -52,7 +52,7 @@ const donoclipSnippet = [
 
 <template>
   <div class="p-1">
-    <UCard v-if="isAuthorized">
+    <UCard v-if="isAuthorized && broadcasterLogin">
       <template #header>
         <img src="~/assets/images/donoclip-logo.svg" alt="Donoclip Logo">
       </template>
@@ -79,7 +79,7 @@ const donoclipSnippet = [
           close
           @update:open="(open) => { if (!open) importError = '' }"
         />
-        <form v-if="broadcasterLogin && (status === 'error' || !data || showDonoclipInstructions)" class="space-y-2" @submit.prevent="importDonoclip">
+        <form v-if="status === 'error' || !data || showDonoclipInstructions" class="space-y-2" @submit.prevent="importDonoclip">
           <p>Import content from donoclip.com</p>
           <div>
             <ol class="list-decimal list-inside">

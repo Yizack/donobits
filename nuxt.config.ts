@@ -124,7 +124,14 @@ export default defineNuxtConfig({
     }
   },
 
-  runtimeConfig: {},
+  runtimeConfig: {
+    twitch: {
+      extension: {
+        clientId: "",
+        secret: ""
+      }
+    }
+  },
 
   routeRules: {
     "/api/donoclip/**": {

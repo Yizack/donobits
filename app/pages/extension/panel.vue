@@ -68,7 +68,6 @@ onMounted(() => {
       body: {
         transaction: {
           displayName: transaction.displayName,
-          initiator: transaction.initiator,
           transactionReceipt: transaction.transactionReceipt
         },
         avatar: getViewerAvatar(clip.ViewerName),
@@ -162,7 +161,6 @@ const filteredClips = computed(() => {
           v-else-if="filteredClips.length"
           class="grid gap-5 grid-cols-2 md:grid-cols-4"
         >
-          <ClipCardSkeleton />
           <ClipCard
             v-for="clip in filteredClips"
             :key="clip.UUID"

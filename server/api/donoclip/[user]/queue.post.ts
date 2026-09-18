@@ -1,10 +1,10 @@
+
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, z.object({
     transaction: z.object({
       displayName: z.string(),
-      initiator: z.enum(["current_user", "other"]),
       transactionReceipt: z.string()
-    }).optional(),
+    }),
     avatar: z.string().optional(),
     clip: z.object({
       ID: z.number(),
@@ -16,6 +16,13 @@ export default defineEventHandler(async (event) => {
       AssetUrl: z.string()
     })
   }).parse);
+
+  if (!await isValidTwitchTransaction(event, body.transaction)) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Invalid Twitch transaction"
+    });
+  }
 
   const params = await getValidatedRouterParams(event, z.object({
     user: z.string().min(1)
