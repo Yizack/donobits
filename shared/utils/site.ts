@@ -6,7 +6,8 @@ export const SITE = {
   twitch: {
     extension: {
       host: `https://${TWITCH_EXTENSION_ID}.ext-twitch.tv`,
-      helper: "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"
+      helper: "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js",
+      products: ["AUDIO"]
     }
   },
   host: import.meta.dev ? "http://localhost:5173" : "https://donobits.yizack.com",

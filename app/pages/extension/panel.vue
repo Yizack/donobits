@@ -1,30 +1,38 @@
 <script setup lang="ts">
+import type { HelixUser } from "@twurple/api";
 import { refDebounced } from "@vueuse/core";
 
 const twitch = useTwitch();
 
-const validSku = [
-  "AUDIO"
-];
-
-const broadcasterLogin = ref<string>();
+const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
 const avatars = ref<Record<string, string>>({});
 
 const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
 
 const isAuthorized = ref(false);
+const errorText = ref<string | null>(null);
 const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
 const bitsLoading = ref(true);
-const bitsError = ref<string | null>(null);
 
 const purchasingId = ref<number | null>(null);
 const playingClipId = ref<number | null>(null);
 
-const purchase = (clipId: number) => {
-  if (!bitsEnabled.value || !bitsProduct.value || purchasingId.value !== null) return;
+const purchase = async (clipId: number) => {
+  if (!bitsEnabled.value
+    || !bitsProduct.value
+    || !broadcaster.value
+    || purchasingId.value !== null
+  ) return;
 
   purchasingId.value = clipId;
+
+  if (!await twitch.isLive(broadcaster.value.id)) {
+    purchasingId.value = null;
+    errorText.value = "The broadcaster is not live";
+    return;
+  }
+
   Twitch.ext.bits.useBits(bitsProduct.value.sku);
 };
 
@@ -35,15 +43,15 @@ onMounted(() => {
     twitch.init(clientId);
 
     bitsLoading.value = true;
-    bitsError.value = null;
+    errorText.value = null;
 
-    broadcasterLogin.value = await twitch.getUserLoginById(channelId);
+    broadcaster.value = await twitch.getUserById(channelId);
 
     Twitch.ext.bits.getProducts().then((products) => {
-      bitsProduct.value = products.find(product => validSku.includes(product.sku)) ?? null;
+      bitsProduct.value = products.find(product => SITE.twitch.extension.products.includes(product.sku)) ?? null;
     }).catch(() => {
       bitsProduct.value = null;
-      bitsError.value = "Bits purchases are unavailable in this Twitch context.";
+      errorText.value = "Bits purchases are unavailable in this Twitch context";
     }).finally(() => {
       bitsLoading.value = false;
     });
@@ -56,15 +64,15 @@ onMounted(() => {
   Twitch.ext.bits.onTransactionComplete((transaction) => {
     if (transaction.initiator !== "current_user"
       || !isAuthorized.value
-      || !validSku.includes(transaction.product.sku)
+      || !SITE.twitch.extension.products.includes(transaction.product.sku)
       || purchasingId.value === null
-      || !broadcasterLogin.value
+      || !broadcaster.value
     ) return;
 
     const clip = data.value?.find(item => item.ID === purchasingId.value);
     if (!clip) return;
 
-    $fetch(`/api/donoclip/${encodeURIComponent(broadcasterLogin.value)}/queue`, {
+    $fetch(`/api/donoclip/${encodeURIComponent(broadcaster.value.name)}/queue`, {
       baseURL: SITE.host,
       method: "POST",
       body: {
@@ -87,10 +95,11 @@ onMounted(() => {
   });
 });
 
+const broadcasterLogin = computed(() => broadcaster.value?.name);
 const { data, error, status, execute } = await useDonoclip(broadcasterLogin);
 
-watch(broadcasterLogin, async () => {
-  if (!broadcasterLogin.value) return;
+watch(broadcaster, async () => {
+  if (!broadcaster.value) return;
   await execute();
 });
 
@@ -116,7 +125,11 @@ const filteredClips = computed(() => {
 
 <template>
   <UMain>
-    <UHeader class="sticky top-0" :toggle="false" :ui="{ left: 'block! w-full', center: 'hidden!', right: 'hidden!' }">
+    <UHeader
+      class="sticky top-0"
+      :toggle="false"
+      :ui="{ left: 'block! w-full', center: 'hidden!', right: 'hidden!' }"
+    >
       <template #left>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <label for="search" class="sr-only">
@@ -135,12 +148,16 @@ const filteredClips = computed(() => {
         </div>
       </template>
     </UHeader>
+
+    <UAlert v-if="errorText" class="sticky top-16 z-50 shadow" color="error" :description="errorText" icon="pixelarticons:alert" />
+
     <UContainer class="py-2">
       <ClientOnly>
         <p class="text-sm text-muted mt-2 mb-3 text-center">
           <span v-if="filteredClips.length === (data?.length ?? 0)">{{ filteredClips.length }} clips</span>
           <span v-else>Showing {{ filteredClips.length }} of {{ data?.length ?? 0 }} clips</span>
         </p>
+
         <div v-if="status === 'idle' || status === 'pending'" class="grid gap-5 grid-cols-2 md:grid-cols-4">
           <ClipCardSkeleton v-for="placeholder in 4" :key="placeholder" />
         </div>
@@ -172,7 +189,7 @@ const filteredClips = computed(() => {
             :clip="clip"
             :price="bitsProduct?.cost.amount"
             :image="getViewerAvatar(clip.ViewerName)"
-            :disabled="bitsLoading || !bitsEnabled"
+            :disabled="bitsLoading || !bitsEnabled || purchasingId !== null"
             :loading="purchasingId === clip.ID"
             @click="purchase(clip.ID)"
           />
