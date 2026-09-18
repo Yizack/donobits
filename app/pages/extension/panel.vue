@@ -9,7 +9,7 @@ const avatars = ref<Record<string, string>>({});
 
 const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
 
-const isAuthorized = ref(false);
+const authorization = ref<Twitch.ext.Authorized | null>(null);
 const errorText = ref<string | null>(null);
 const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
@@ -27,7 +27,7 @@ const purchase = async (clipId: number) => {
 
   purchasingId.value = clipId;
 
-  if (!await twitch.isLive(broadcaster.value.id)) {
+  if (!import.meta.dev && !await twitch.isLive(broadcaster.value.id)) {
     purchasingId.value = null;
     errorText.value = `${broadcaster.value.displayName} is not live`;
     return;
@@ -38,7 +38,7 @@ const purchase = async (clipId: number) => {
 
 onMounted(() => {
   Twitch.ext.onAuthorized(async (auth) => {
-    isAuthorized.value = true;
+    authorization.value = auth;
     bitsEnabled.value = Twitch.ext.features.isBitsEnabled;
     twitch.init(auth.clientId);
 
@@ -63,7 +63,7 @@ onMounted(() => {
 
   Twitch.ext.bits.onTransactionComplete((transaction) => {
     if (transaction.initiator !== "current_user"
-      || !isAuthorized.value
+      || !authorization.value
       || !SITE.twitch.extension.products.includes(transaction.product.sku)
       || purchasingId.value === null
       || !broadcaster.value
@@ -75,6 +75,9 @@ onMounted(() => {
     $fetch(`/api/donoclip/${encodeURIComponent(broadcaster.value.name)}/queue`, {
       baseURL: SITE.host,
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${authorization.value?.token}`
+      },
       body: {
         transaction: {
           displayName: transaction.displayName,
@@ -103,9 +106,9 @@ watch(broadcaster, async () => {
   await execute();
 });
 
-watch([isAuthorized, data], async () => {
+watch([authorization, data], async () => {
   const names = (data.value ?? []).map(clip => clip.ViewerName.toLowerCase());
-  if (isAuthorized.value && names.length) {
+  if (authorization.value && names.length) {
     avatars.value = await twitch.getAvatars(names);
   }
 }, { immediate: true });

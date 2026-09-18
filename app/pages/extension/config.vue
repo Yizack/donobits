@@ -7,8 +7,7 @@ const form = ref({
 
 const twitch = useTwitch();
 
-const isAuthorized = ref(false);
-
+const authorization = ref<Twitch.ext.Authorized | null>(null);
 const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
 const loading = ref(false);
 const showDonoclipInstructions = ref(false);
@@ -22,6 +21,9 @@ const importDonoclip = () => {
   $fetch(`/api/donoclip/${broadcasterLogin.value}`, {
     baseURL: SITE.host,
     method: "POST",
+    headers: {
+      Authorization: `Bearer ${authorization.value?.token}`
+    },
     body: form.value.donoclip
   }).then(async () => {
     await execute();
@@ -37,7 +39,7 @@ const importDonoclip = () => {
 
 onMounted(async () => {
   Twitch.ext.onAuthorized(async (auth) => {
-    isAuthorized.value = true;
+    authorization.value = auth;
     twitch.init(auth.clientId);
     broadcaster.value = await twitch.getUserById(auth.channelId);
     await execute();
@@ -55,7 +57,7 @@ const donoclipSnippet = [
 
 <template>
   <div class="p-1">
-    <UCard v-if="isAuthorized && broadcasterLogin">
+    <UCard v-if="authorization && broadcasterLogin">
       <template #header>
         <img src="~/assets/images/donoclip-logo.svg" alt="Donoclip Logo">
       </template>

@@ -17,9 +17,9 @@ export default defineEventHandler(async (event) => {
     })
   }).parse);
 
-  const payload = await validateTwitchTransaction(event, body.transaction);
+  const txPayload = await validateTwitchTransaction(event, body.transaction);
 
-  if (!payload) {
+  if (!txPayload) {
     throw createError({
       status: 400,
       message: "Invalid Twitch transaction"
@@ -46,8 +46,8 @@ export default defineEventHandler(async (event) => {
             displayName: body.transaction.displayName,
             product: {
               cost: {
-                amount: String(payload.data.product.cost.amount),
-                type: payload.data.product.cost.type
+                amount: String(txPayload.data.product.cost.amount),
+                type: txPayload.data.product.cost.type
               }
             }
           },
@@ -59,6 +59,18 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, 204);
     return;
+  }
+
+  const headers = getHeaders(event);
+  const token = headers.authorization?.replace("Bearer ", "");
+
+  const payload = await validateTwitchExtension(event, token);
+
+  if (!payload) {
+    throw createError({
+      status: 400,
+      message: "Invalid authorization"
+    });
   }
 
   const durableFetch = event.context.cloudflare?.durableFetch;

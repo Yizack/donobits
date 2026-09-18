@@ -29,10 +29,10 @@ export const validateTwitchTransaction = async (
   transaction: Pick<Twitch.ext.BitsTransaction, "displayName" | "transactionReceipt">
 ) => {
   const twitch = useRuntimeConfig(event);
-  const secretBytes = Buffer.from(twitch.twitch.extension.secret, "base64");
+  const key = Buffer.from(twitch.twitch.extension.secret, "base64");
 
   try {
-    const { payload } = await jwtVerify<TwitchTransactionPayload>(transaction.transactionReceipt, secretBytes, {
+    const { payload } = await jwtVerify<TwitchTransactionPayload>(transaction.transactionReceipt, key, {
       algorithms: ["HS256"]
     });
 
@@ -46,6 +46,32 @@ export const validateTwitchTransaction = async (
     ) {
       return payload;
     }
+
+    return null;
+  }
+  catch {
+    return null;
+  }
+};
+
+export const validateTwitchExtension = async (
+  event: H3Event,
+  token?: string
+) => {
+  if (!token) return null;
+
+  const twitch = useRuntimeConfig(event);
+  const key = Buffer.from(twitch.twitch.extension.secret, "base64");
+
+  try {
+    const { payload } = await jwtVerify<TwitchExtensionPayload>(token, key, {
+      algorithms: ["HS256"]
+    });
+
+    if (Date.now() < payload.exp * 1000) {
+      return payload;
+    }
+    return null;
   }
   catch {
     return null;
