@@ -153,11 +153,22 @@ onBeforeUnmount(destroyWaveform);
 </script>
 
 <template>
-  <div class="relative h-100 w-full">
-    <div ref="waveform" class="absolute inset-0" />
+  <div class="relative h-100 w-full bg-black/95 rounded-4xl">
+    <div class="absolute top-0 left-0 flex items-center text-3xl p-2">
+      <UIcon name="pixelarticons:play" size="3.5rem" class="text-primary" />
+      <div>Donobits</div>
+    </div>
+    <div ref="waveform" class="absolute inset-0 ps-3" />
+    <UButton
+      class="absolute top-0 right-0 m-5"
+      size="xl"
+      color="bits100"
+      icon="twitch:cheer"
+      :label="`${item.transaction.product.cost.amount} ${item.transaction.product.cost.type}`"
+    />
     <div
       v-if="item.avatar || item.transaction.displayName"
-      class="pointer-events-none absolute left-1/2 top-1/2 z-10 flex max-w-[calc(100%-2rem)] -translate-1/2 flex-col items-center gap-1 bg-black/75 p-8"
+      class="pointer-events-none absolute left-1/2 top-1/2 z-10 flex max-w-[calc(100%-2rem)] -translate-1/2 flex-col items-center gap-1 bg-black/80 px-8 py-6 border border-default"
     >
       <div v-if="item.avatar" class="relative">
         <img
@@ -172,22 +183,14 @@ onBeforeUnmount(destroyWaveform);
 
       <UBadge
         :label="item.clip.ViewerName"
-        class="text-lg w-full text-center block border-2"
+        class="text-2xl w-full text-center block"
       />
 
-      <UButton
-        color="bits100"
-        size="lg"
-        icon="twitch:cheer"
-        class="group"
-        :ui="{ leadingIcon: 'group-hover:scale-120 transition-transform' }"
-        :label="`${item.transaction.product.cost.amount} ${item.transaction.product.cost.type}`"
-        block
-      />
+      <USeparator class="bg-accented my-2" />
 
-      <div>
+      <div class="flex items-center gap-2 text-2xl">
         <UIcon name="pixelarticons:shopping-cart" />
-        {{ item.transaction.displayName }}
+        <span>{{ item.transaction.displayName }}</span>
       </div>
     </div>
   </div>

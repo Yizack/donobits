@@ -27,7 +27,7 @@ const testUser = "yizack";
 const queueTestClip = async () => {
   addToQueue({
     transaction: {
-      displayName: "Local test",
+      displayName: "Yizack",
       product: {
         cost: {
           amount: "100",
