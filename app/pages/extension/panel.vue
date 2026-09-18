@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { refDebounced } from "@vueuse/core";
+
 const twitch = useTwitch();
 
 const validSku = [
@@ -100,9 +102,10 @@ watch([isAuthorized, data], async () => {
 }, { immediate: true });
 
 const viewerSearch = ref("");
+const debouncedViewerSearch = refDebounced(viewerSearch, 200);
 
 const filteredClips = computed(() => {
-  const query = viewerSearch.value.trim().toLowerCase();
+  const query = debouncedViewerSearch.value.trim().toLowerCase();
   const clips = data.value ?? [];
 
   if (!query) return clips;
@@ -127,6 +130,7 @@ const filteredClips = computed(() => {
             size="sm"
             placeholder="Search user..."
             class="w-full"
+            :loading="viewerSearch !== debouncedViewerSearch"
           />
         </div>
       </template>
