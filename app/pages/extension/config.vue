@@ -60,20 +60,24 @@ const donoclipSnippet = [
         <img src="~/assets/images/donoclip-logo.svg" alt="Donoclip Logo">
       </template>
       <div class="space-y-2">
-        <UAlert
-          v-if="data && status === 'success'"
-          color="neutral"
-          variant="subtle"
-          :description="`Imported ${data.length} items`"
-          :actions="[
-            {
-              label: 'Import Again',
-              onClick: () => {
-                showDonoclipInstructions = true;
+        <div v-if="data && status === 'success'" class="space-y-2">
+          <UAlert
+
+            color="neutral"
+            variant="subtle"
+            :description="`Imported ${data.length} items`"
+            :actions="[
+              {
+                label: 'Import Again',
+                onClick: () => {
+                  showDonoclipInstructions = true;
+                },
               },
-            },
-          ]"
-        />
+            ]"
+          />
+          <p>Copy and paste the URL below into an OBS Browser Source:</p>
+          <CopySource :user="broadcasterLogin" />
+        </div>
         <UAlert
           v-if="importError"
           color="error"
