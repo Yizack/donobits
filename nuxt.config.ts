@@ -1,6 +1,5 @@
 import icons from "./app/icons.ts";
-
-const twitchExtHelper = "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js";
+import { SITE } from "./shared/utils/site.ts";
 
 export default defineNuxtConfig({
   modules: [
@@ -14,7 +13,7 @@ export default defineNuxtConfig({
     app: {
       head: {
         script: [
-          { src: twitchExtHelper }
+          { src: SITE.twitch.extension.helper }
         ]
       }
     },
@@ -43,7 +42,7 @@ export default defineNuxtConfig({
             class: "dark"
           },
           script: [
-            { src: twitchExtHelper }
+            { src: SITE.twitch.extension.helper }
           ]
         }
       },
@@ -124,7 +123,7 @@ export default defineNuxtConfig({
   runtimeConfig: {},
 
   routeRules: {
-    "/api/**": { cors: true }
+    "/api/donoclip/**": { headers: { "Access-Control-Allow-Origin": SITE.twitch.extension.host } }
   },
 
   features: {
