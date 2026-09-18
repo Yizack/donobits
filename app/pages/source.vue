@@ -54,11 +54,8 @@ onMounted(() => {
 
   useWebSocket(`/ws/source?user=${encodeURIComponent(user)}`, {
     autoReconnect: true,
-    onMessage: async (ws, event) => {
-      const data = typeof event.data === "string" ? event.data : await event.data.text();
-      console.info("Received WebSocket message:", data);
-
-      const message: DonobitsQueuedEvent = JSON.parse(data);
+    onMessage: async (ws, event: MessageEvent<string>) => {
+      const message: DonobitsQueuedEvent = JSON.parse(event.data);
       if (!message.data) return;
 
       switch (message.type) {
