@@ -18,8 +18,7 @@ const { data, status, execute } = await useDonoclip(broadcasterLogin);
 
 const importDonoclip = () => {
   loading.value = true;
-  $fetch(`/api/donoclip/${broadcasterLogin.value}`, {
-    baseURL: SITE.host,
+  extFetch(`/api/donoclip/${broadcasterLogin.value}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${authorization.value?.token}`
@@ -78,7 +77,7 @@ const donoclipSnippet = [
             ]"
           />
           <p>Copy and paste the URL below into an OBS Browser Source:</p>
-          <CopySource :user="broadcasterLogin" />
+          <ConfigCopySource :user="broadcasterLogin" />
         </div>
         <UAlert
           v-if="importError"

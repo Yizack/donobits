@@ -5,11 +5,11 @@ const props = defineProps<{
   price?: string;
   disabled: boolean;
   loading: boolean;
+  volume: number;
 }>();
 
-const model = defineModel<number | null>();
-
-const isPlaying = computed(() => model.value === props.clip.ID);
+const playingClipId = ref<number | null>(null);
+const isPlaying = computed(() => playingClipId.value === props.clip.ID);
 
 const emit = defineEmits<{
   click: [];
@@ -27,7 +27,7 @@ const togglePlayback = async () => {
     player.currentTime = 0;
 
     if (!wasPlaying) {
-      model.value = null;
+      playingClipId.value = null;
     }
 
     return;
@@ -37,18 +37,12 @@ const togglePlayback = async () => {
     await player.play();
   }
   catch {
-    model.value = null;
+    playingClipId.value = null;
   }
 };
 
 const handlePlay = () => {
-  model.value = props.clip.ID;
-};
-
-const handlePause = () => {
-  if (!audio.value?.ended) {
-    model.value = null;
-  }
+  playingClipId.value = props.clip.ID;
 };
 
 const handleEnded = () => {
@@ -56,7 +50,7 @@ const handleEnded = () => {
     audio.value.currentTime = 0;
   }
 
-  model.value = null;
+  playingClipId.value = null;
 };
 
 watch(isPlaying, (isPlaying) => {
@@ -66,6 +60,13 @@ watch(isPlaying, (isPlaying) => {
   player.pause();
   player.currentTime = 0;
 });
+
+const setAudioVolume = () => {
+  if (!audio.value) return;
+  audio.value.volume = Math.min(1, Math.max(0, props.volume / 100));
+};
+
+watch(() => props.volume, setAudioVolume);
 </script>
 
 <template>
@@ -117,7 +118,6 @@ watch(isPlaying, (isPlaying) => {
         :src="clip.AssetUrl"
         :aria-label="`Play clip from ${clip.ViewerName}`"
         @ended="handleEnded"
-        @pause="handlePause"
         @play="handlePlay"
       >
         Your browser does not support audio playback.

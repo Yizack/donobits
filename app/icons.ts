@@ -7,5 +7,7 @@ export default [
   "pixelarticons:clipboard-note",
   "pixelarticons:close",
   "pixelarticons:alert",
-  "pixelarticons:shopping-cart"
+  "pixelarticons:shopping-cart",
+  "pixelarticons:volume-x",
+  "pixelarticons:volume-3"
 ];
