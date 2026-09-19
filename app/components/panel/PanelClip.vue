@@ -8,7 +8,7 @@ const props = defineProps<{
   volume: number;
 }>();
 
-const playingClipId = ref<number | null>(null);
+const playingClipId = defineModel<number | null>({ required: true });
 const isPlaying = computed(() => playingClipId.value === props.clip.ID);
 
 const emit = defineEmits<{
@@ -16,6 +16,12 @@ const emit = defineEmits<{
 }>();
 
 const audio = ref<HTMLAudioElement | null>(null);
+
+const clearPlayingClip = () => {
+  if (playingClipId.value === props.clip.ID) {
+    playingClipId.value = null;
+  }
+};
 
 const togglePlayback = async () => {
   const player = audio.value;
@@ -37,7 +43,7 @@ const togglePlayback = async () => {
     await player.play();
   }
   catch {
-    playingClipId.value = null;
+    clearPlayingClip();
   }
 };
 
@@ -50,7 +56,7 @@ const handleEnded = () => {
     audio.value.currentTime = 0;
   }
 
-  playingClipId.value = null;
+  clearPlayingClip();
 };
 
 watch(isPlaying, (isPlaying) => {
@@ -117,8 +123,9 @@ watch(() => props.volume, setAudioVolume);
         class="h-10 w-full"
         :src="clip.AssetUrl"
         :aria-label="`Play clip from ${clip.ViewerName}`"
-        @ended="handleEnded"
         @play="handlePlay"
+        @pause="handleEnded"
+        @ended="handleEnded"
       >
         Your browser does not support audio playback.
       </audio>

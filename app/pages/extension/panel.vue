@@ -15,6 +15,7 @@ const errorText = ref<string | null>(null);
 const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
 const purchasingId = ref<number | null>(null);
+const playingClipId = ref<number | null>(null);
 const volume = ref(100);
 
 const purchase = async (clipId: number) => {
@@ -203,6 +204,7 @@ watch(volume, (newVolume) => {
           <PanelClip
             v-for="clip in visibleAudioClips"
             :key="clip.ID"
+            v-model="playingClipId"
             :clip="clip"
             :price="bitsProduct?.cost.amount"
             :image="getViewerAvatar(clip.ViewerName)"
