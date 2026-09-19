@@ -73,6 +73,7 @@ const setAudioVolume = () => {
 };
 
 watch(() => props.volume, setAudioVolume);
+onMounted(setAudioVolume);
 </script>
 
 <template>
