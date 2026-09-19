@@ -5,6 +5,19 @@ const search = defineModel<string>("search", { required: true });
 const debouncedSearch = refDebounced(search, 200);
 
 const volume = defineModel<number>("volume", { required: true });
+
+const volumeIcon = computed(() => {
+  switch (true) {
+    case volume.value === 0:
+      return "pixelarticons:volume-x";
+    case volume.value <= 33:
+      return "pixelarticons:volume-1";
+    case volume.value <= 66:
+      return "pixelarticons:volume-2";
+    default:
+      return "pixelarticons:volume-3";
+  }
+});
 </script>
 
 <template>
@@ -36,7 +49,7 @@ const volume = defineModel<number>("volume", { required: true });
         <UButton
           color="neutral"
           variant="outline"
-          :icon="volume > 0 ? 'pixelarticons:volume-3' : 'pixelarticons:volume-x'"
+          :icon="volumeIcon"
         />
         <template #content>
           <div class="w-10 flex flex-col items-center justify-center gap-2 py-2">
