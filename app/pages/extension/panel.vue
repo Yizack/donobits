@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { HelixUser } from "@twurple/api";
-import { refDebounced } from "@vueuse/core";
+import { refDebounced, useInfiniteScroll } from "@vueuse/core";
 
 const twitch = useTwitch();
 
@@ -104,6 +104,7 @@ onMounted(() => {
 
 const broadcasterLogin = computed(() => broadcaster.value?.name);
 const { data, error, status, execute } = await useDonoclip(broadcasterLogin);
+
 const audioClips = computed(() => data.value?.filter(clip => clip.Type === "audio") ?? []);
 
 watch(broadcasterLogin, async (login, previousLogin) => {
@@ -116,19 +117,35 @@ watch([isAuthorized, data], async () => {
   if (isAuthorized.value && names.length) {
     avatars.value = await twitch.getAvatars(names);
   }
-}, { immediate: true });
+});
 
-const viewerSearch = ref("");
-const debouncedViewerSearch = refDebounced(viewerSearch, 200);
+const search = ref("");
+const debouncedSearch = refDebounced(search, 200);
 
 const filteredClips = computed(() => {
-  const query = debouncedViewerSearch.value.trim().toLowerCase();
+  const query = debouncedSearch.value.trim().toLowerCase();
   const clips = audioClips.value;
 
   if (!query) return clips;
 
   return clips.filter(clip => clip.ViewerName.toLowerCase().includes(query));
 });
+
+const perScroll = 6;
+const scrollCount = ref(0);
+
+watch(debouncedSearch, () => {
+  scrollCount.value = 0;
+  scrollTo(0, 0);
+});
+
+watch(audioClips, () => {
+  useInfiniteScroll(document, () => {
+    scrollCount.value++;
+  }, { distance: 100 });
+});
+
+const visibleAudioClips = computed(() => filteredClips.value.slice(0, perScroll + (scrollCount.value * perScroll)));
 </script>
 
 <template>
@@ -145,13 +162,13 @@ const filteredClips = computed(() => {
           </label>
           <UInput
             id="search"
-            v-model="viewerSearch"
+            v-model="search"
             icon="pixelarticons:search"
             type="search"
             size="sm"
             placeholder="Search user..."
             class="w-full"
-            :loading="viewerSearch !== debouncedViewerSearch"
+            :loading="search !== debouncedSearch"
           />
         </div>
       </template>
@@ -203,7 +220,7 @@ const filteredClips = computed(() => {
           class="grid gap-5 grid-cols-2 md:grid-cols-4"
         >
           <ClipCard
-            v-for="clip in filteredClips"
+            v-for="clip in visibleAudioClips"
             :key="clip.UUID"
             v-model="playingClipId"
             :clip="clip"
