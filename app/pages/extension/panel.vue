@@ -73,7 +73,7 @@ onMounted(() => {
       || !broadcaster.value
     ) return;
 
-    const clip = data.value?.find(item => item.ID === purchasingId.value);
+    const clip = audioClips.value?.find(item => item.ID === purchasingId.value);
     if (!clip) return;
 
     $fetch(`/api/donoclip/${encodeURIComponent(broadcaster.value.name)}/queue`, {
@@ -104,6 +104,7 @@ onMounted(() => {
 
 const broadcasterLogin = computed(() => broadcaster.value?.name);
 const { data, error, status, execute } = await useDonoclip(broadcasterLogin);
+const audioClips = computed(() => data.value?.filter(clip => clip.Type === "audio") ?? []);
 
 watch(broadcasterLogin, async (login, previousLogin) => {
   if (!login || login === previousLogin) return;
@@ -111,7 +112,7 @@ watch(broadcasterLogin, async (login, previousLogin) => {
 });
 
 watch([isAuthorized, data], async () => {
-  const names = (data.value ?? []).map(clip => clip.ViewerName.toLowerCase());
+  const names = (audioClips.value ?? []).map(clip => clip.ViewerName.toLowerCase());
   if (isAuthorized.value && names.length) {
     avatars.value = await twitch.getAvatars(names);
   }
@@ -122,7 +123,7 @@ const debouncedViewerSearch = refDebounced(viewerSearch, 200);
 
 const filteredClips = computed(() => {
   const query = debouncedViewerSearch.value.trim().toLowerCase();
-  const clips = data.value ?? [];
+  const clips = audioClips.value;
 
   if (!query) return clips;
 
@@ -173,8 +174,8 @@ const filteredClips = computed(() => {
     <UContainer class="py-2">
       <ClientOnly>
         <p class="text-sm text-muted mt-2 mb-3 text-center">
-          <span v-if="filteredClips.length === (data?.length ?? 0)">{{ filteredClips.length }} clips</span>
-          <span v-else>Showing {{ filteredClips.length }} of {{ data?.length ?? 0 }} clips</span>
+          <span v-if="filteredClips.length === (audioClips?.length ?? 0)">{{ filteredClips.length }} clips</span>
+          <span v-else>Showing {{ filteredClips.length }} of {{ audioClips?.length ?? 0 }} clips</span>
         </p>
 
         <div v-if="status === 'idle' || status === 'pending'" class="grid gap-5 grid-cols-2 md:grid-cols-4">
