@@ -76,7 +76,14 @@ export default defineNuxtConfig({
           build: {
             rolldownOptions: {
               output: {
-                codeSplitting: false
+                codeSplitting: {
+                  groups: [
+                    {
+                      name: "vendor",
+                      test: /node_modules[\\/]/
+                    }
+                  ]
+                }
               }
             }
           }
