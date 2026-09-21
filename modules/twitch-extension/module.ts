@@ -17,6 +17,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
     helperScript: "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js",
     clientId: "",
     type: ["panel"],
+    filename: "extension.zip",
     pages: {
       dirname: "extension"
     },
@@ -102,7 +103,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
 
         // Create a ZIP archive of the built public assets for the Twitch extension
         const archive = new ZipArchive();
-        const archivePath = resolve(nitro.options.output.dir, "extension.zip");
+        const archivePath = resolve(nitro.options.output.dir, options.filename);
         const archiveOutput = createWriteStream(archivePath);
 
         await new Promise<void>((finish, fail) => {
