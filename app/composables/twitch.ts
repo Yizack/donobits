@@ -22,11 +22,11 @@ export const useTwitch = () => {
     if (!logins.length) return {};
 
     const userProfiles = await Promise.all(
-      logins.map(name => twitch.users.getUserByNameBatched(name))
+      logins.map(twitch.users.getUserByNameBatched)
     );
 
     return Object.fromEntries(
-      userProfiles.flat().map(user => [user?.name.toLowerCase(), user?.profilePictureUrl])
+      userProfiles.flat().map(user => [user?.name, user?.profilePictureUrl])
     );
   };
 
