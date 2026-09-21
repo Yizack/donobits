@@ -7,7 +7,7 @@ const localMode = import.meta.dev;
 
 if (!user) {
   throw createError({
-    status: 400,
+    status: StatusCode.BAD_REQUEST,
     message: "User query parameter is required",
     fatal: true
   });

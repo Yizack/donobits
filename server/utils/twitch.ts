@@ -82,7 +82,7 @@ export const ensureTwitchExtension = async (event: H3Event) => {
 
   if (!payload) {
     throw createError({
-      status: 400,
+      status: StatusCode.BAD_REQUEST,
       message: "Invalid authorization"
     });
   }

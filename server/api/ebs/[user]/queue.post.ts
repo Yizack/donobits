@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   if (!payload) {
     throw createError({
-      status: 400,
+      status: StatusCode.BAD_REQUEST,
       message: "Invalid Twitch transaction"
     });
   }
@@ -53,8 +53,7 @@ export default defineEventHandler(async (event) => {
       }));
     }
 
-    setResponseStatus(event, 204);
-    return;
+    return sendNoContent(event);
   }
 
   await ensureTwitchExtension(event);
@@ -62,7 +61,7 @@ export default defineEventHandler(async (event) => {
   const durableFetch = event.context.cloudflare?.durableFetch;
   if (!durableFetch) {
     throw createError({
-      status: 503,
+      status: StatusCode.SERVICE_UNAVAILABLE,
       message: "Durable Object service unavailable"
     });
   }
@@ -79,12 +78,12 @@ export default defineEventHandler(async (event) => {
 
   if (!publishResponse.ok) {
     throw createError({
-      status: 502,
+      status: StatusCode.BAD_GATEWAY,
       message: "Failed to publish queued clip"
     });
   }
 
-  setResponseStatus(event, 202);
+  setResponseStatus(event, StatusCode.ACCEPTED);
 
   return { success: true };
 });
