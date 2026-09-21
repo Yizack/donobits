@@ -14,7 +14,7 @@ Import your donoclips.com library and let your community redeem sounds with Bits
 
 3. Twitch Extension Config
 
-<img width="1320" height="990" alt="image" src="https://github.com/user-attachments/assets/ba0dbc36-0115-4da6-98da-96c2ce400e15" />
+<img width="1320" height="659" alt="image" src="https://github.com/user-attachments/assets/1d465fbf-af5b-490e-bbb7-7d08b630db2a" />
 
 4. Twitch Extension Content Imported
 
