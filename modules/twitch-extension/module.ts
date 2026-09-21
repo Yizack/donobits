@@ -3,8 +3,10 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { ZipArchive } from "archiver";
 import { addServerHandler, createResolver, defineNuxtModule } from "nuxt/kit";
-import type { NuxtTwitchExtensionOptions } from "./types.ts";
+import type { ModuleOptions, NuxtTwitchExtensionOptions } from "./types.ts";
 import type {} from "@nuxt/nitro-server/augments";
+
+export type { ModuleOptions, NuxtTwitchExtensionOptions };
 
 export default defineNuxtModule<NuxtTwitchExtensionOptions>({
   meta: {
@@ -116,7 +118,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
     }
 
     // Production options
-    if (nuxt.options.envName === "production") {
+    if (nuxt.options.envName === "production" && !nuxt.options._prepare) {
       options.clientId ||= process.env.NUXT_TWITCH_EXTENSION_CLIENT_ID;
 
       if (!options.clientId) {
