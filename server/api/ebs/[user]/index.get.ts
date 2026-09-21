@@ -3,5 +3,7 @@ export default defineEventHandler(async (event) => {
     user: z.string()
   }).parse);
 
-  return blob.serve(event, `donoclip/${params.user}`);
+  await ensureTwitchExtension(event);
+
+  return blob.serve(event, `donobits/${params.user}.json`) as unknown as Donobits[];
 });

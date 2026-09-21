@@ -14,7 +14,7 @@ if (!user) {
 }
 
 const queued = ref<DonoBitsQueueItem[]>([]);
-const addToQueue = (queue: DonobitsQueue) => queued.value.push({ ...queue, queueId: nextQueueId++ });
+const addToQueue = (queue: DonobitsQueued) => queued.value.push({ ...queue, queueId: nextQueueId++ });
 let nextQueueId = 0;
 
 const testLoading = ref(false);
@@ -35,15 +35,12 @@ const queueTestClip = async () => {
         }
       }
     },
-    avatar: "https://static-cdn.jtvnw.net/jtv_user_pictures/4f6e670e-fcbb-44f4-92a6-7340a86227d1-profile_image-300x300.png",
-    clip: {
-      ID: 1443902,
-      UUID: "b9bf27e6-308a-4c68-97f6-dad62843b975",
-      Type: "audio",
-      ViewerName: "TifannyMusso",
-      UploadedAt: 1789436673296,
-      ModDecision: 2,
-      AssetUrl: "https://donoclip-assets-994b4a9.s3.eu-central-1.amazonaws.com/jimrsng/b9bf27e6-308a-4c68-97f6-dad62843b975.webm"
+    image: "https://static-cdn.jtvnw.net/jtv_user_pictures/4f6e670e-fcbb-44f4-92a6-7340a86227d1-profile_image-300x300.png",
+    data: {
+      uuid: "b9bf27e6-308a-4c68-97f6-dad62843b975",
+      type: "audio",
+      name: "TifannyMusso",
+      url: "https://donoclip-assets-994b4a9.s3.eu-central-1.amazonaws.com/jimrsng/b9bf27e6-308a-4c68-97f6-dad62843b975.webm"
     }
   });
 };
@@ -71,15 +68,15 @@ onMounted(() => {
 <template>
   <main>
     <AudioVisualizer
-      v-if="current?.clip.Type === 'audio'"
+      v-if="current?.data.type === 'audio'"
       :key="`audio-${current.queueId}`"
       :item="current"
       @ended="queued.shift()"
     />
     <video
-      v-else-if="current?.clip.Type === 'video'"
+      v-else-if="current?.data.type === 'video'"
       :key="`video-${current.queueId}`"
-      :src="current.clip.AssetUrl"
+      :src="current.data.url"
       autoplay
       @ended="queued.shift()"
     />

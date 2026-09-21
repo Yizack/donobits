@@ -21,3 +21,5 @@ export interface Donoclip {
   AssetBackgroundAmp: number;
   AssetPeakAmp: number;
 }
+
+export type DonoclipImport = Pick<Donoclip, "ID" | "UUID" | "Type" | "ViewerName" | "UploadedAt" | "AssetUrl" | "ModDecision">;

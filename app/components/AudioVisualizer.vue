@@ -79,7 +79,7 @@ const startAudio = async (generation: number) => {
 
     if (generation !== runtime.generation) return;
 
-    const audioData = await $fetch<ArrayBuffer>(props.item.clip.AssetUrl, { responseType: "arrayBuffer" })
+    const audioData = await $fetch<ArrayBuffer>(props.item.data.url, { responseType: "arrayBuffer" })
       .catch(() => {
         throw new Error("Failed to fetch audio data");
       });
@@ -141,7 +141,7 @@ const createWaveform = async () => {
   startAudio(generation);
 };
 
-watch(() => props.item.clip.AssetUrl, () => {
+watch(() => props.item.data.url, () => {
   createWaveform();
 });
 
@@ -167,13 +167,13 @@ onBeforeUnmount(destroyWaveform);
       :label="`${item.transaction.product.cost.amount} ${item.transaction.product.cost.type}`"
     />
     <div
-      v-if="item.avatar || item.transaction.displayName"
+      v-if="item.image || item.transaction.displayName"
       class="pointer-events-none absolute left-1/2 top-1/2 z-10 flex max-w-[calc(100%-2rem)] -translate-1/2 flex-col items-center gap-1 bg-black/80 px-8 py-6 border border-default"
     >
-      <div v-if="item.avatar" class="relative">
+      <div v-if="item.image" class="relative">
         <img
-          :src="item.avatar"
-          :alt="`Avatar of ${item.transaction.displayName}`"
+          :src="item.image"
+          :alt="item.transaction.displayName"
           class="size-32 shrink-0 rounded-full border-4 border-white/80 object-cover shadow-xl"
         >
         <div
@@ -182,7 +182,7 @@ onBeforeUnmount(destroyWaveform);
       </div>
 
       <UBadge
-        :label="item.clip.ViewerName"
+        :label="item.data.name"
         class="text-2xl w-full text-center block"
       />
 

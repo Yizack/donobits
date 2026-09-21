@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = defineProps<{
-  clip: Donoclip;
+  data: Donobits;
   image?: string;
   price?: string;
   disabled: boolean;
@@ -8,8 +8,8 @@ const props = defineProps<{
   volume: number;
 }>();
 
-const playingClipId = defineModel<number | null>({ required: true });
-const isPlaying = computed(() => playingClipId.value === props.clip.ID);
+const playingClipId = defineModel<string | null>({ required: true });
+const isPlaying = computed(() => playingClipId.value === props.data.uuid);
 
 const emit = defineEmits<{
   click: [];
@@ -18,7 +18,7 @@ const emit = defineEmits<{
 const audio = ref<HTMLAudioElement | null>(null);
 
 const clearPlayingClip = () => {
-  if (playingClipId.value === props.clip.ID) {
+  if (playingClipId.value === props.data.uuid) {
     playingClipId.value = null;
   }
 };
@@ -48,7 +48,7 @@ const togglePlayback = async () => {
 };
 
 const handlePlay = () => {
-  playingClipId.value = props.clip.ID;
+  playingClipId.value = props.data.uuid;
 };
 
 const handleEnded = () => {
@@ -92,8 +92,8 @@ onMounted(setAudioVolume);
       <div class="absolute inset-0 bg-black/50 transition-colors group-hover:bg-black/75" />
       <div class="flex h-30 w-full items-center gap-3">
         <UBadge
-          :label="clip.ViewerName"
-          :title="clip.ViewerName"
+          :label="data.name"
+          :title="data.name"
           class="absolute -top-2 left-1/2 -translate-x-1/2 border-2 shadow-lg"
           :ui="{ label: 'max-w-25 truncate' }"
         />
@@ -102,7 +102,7 @@ onMounted(setAudioVolume);
       <button
         type="button"
         class="absolute inset-0 z-10 flex items-center justify-center text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-        :aria-label="isPlaying ? `Stop clip from ${clip.ViewerName}` : `Play clip from ${clip.ViewerName}`"
+        :aria-label="isPlaying ? `Stop clip from ${data.name}` : `Play clip from ${data.name}`"
         @click="togglePlayback"
       >
         <UIcon
@@ -122,8 +122,8 @@ onMounted(setAudioVolume);
         ref="audio"
         preload="none"
         class="h-10 w-full"
-        :src="clip.AssetUrl"
-        :aria-label="`Play clip from ${clip.ViewerName}`"
+        :src="data.url"
+        :aria-label="`Play clip from ${data.name}`"
         @play="handlePlay"
         @pause="handleEnded"
         @ended="handleEnded"
@@ -141,7 +141,7 @@ onMounted(setAudioVolume);
           icon="twitch:cheer"
           class="group"
           :ui="{ leadingIcon: 'group-hover:scale-120 transition-transform' }"
-          :title="`Queue clip from ${clip.ViewerName}`"
+          :title="`Queue clip from ${data.name}`"
           :loading="loading"
           :disabled="disabled || loading"
           :label="price ?? 'Free'"

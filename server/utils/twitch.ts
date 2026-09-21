@@ -28,8 +28,8 @@ export const validateTwitchTransaction = async (
   event: H3Event,
   transaction: Pick<Twitch.ext.BitsTransaction, "displayName" | "transactionReceipt">
 ) => {
-  const twitch = useRuntimeConfig(event);
-  const key = Buffer.from(twitch.twitch.extension.secret, "base64");
+  const config = useRuntimeConfig(event);
+  const key = Buffer.from(config.twitch.extension.secret, "base64");
 
   try {
     const { payload } = await jwtVerify<TwitchTransactionPayload>(transaction.transactionReceipt, key, {
@@ -40,7 +40,7 @@ export const validateTwitchTransaction = async (
     const age = Date.now() - transactionTime.getTime();
 
     if (payload.topic === "bits_transaction_receipt"
-      && payload.data.product.domainId === `twitch.ext.${twitch.twitch.extension.clientId}`
+      && payload.data.product.domainId === `twitch.ext.${config.twitch.extension.clientId}`
       && payload.data.product.cost.type === "bits"
       && age < TOLERANCE_MINUTES * 60 * 1000
     ) {
@@ -54,26 +54,43 @@ export const validateTwitchTransaction = async (
   }
 };
 
-export const validateTwitchExtension = async (
+const validateTwitchExtension = async (
   event: H3Event,
-  token?: string
+  token?: string,
+  channelId?: string
 ) => {
-  if (!token) return null;
+  if (!token || !channelId) return null;
 
-  const twitch = useRuntimeConfig(event);
-  const key = Buffer.from(twitch.twitch.extension.secret, "base64");
+  const config = useRuntimeConfig(event);
+  const key = Buffer.from(config.twitch.extension.secret, "base64");
 
   try {
     const { payload } = await jwtVerify<TwitchExtensionPayload>(token, key, {
       algorithms: ["HS256"]
     });
 
-    if (Date.now() < payload.exp * 1000) {
+    if (payload.channel_id === channelId
+      && Date.now() < payload.exp * 1000
+    ) {
       return payload;
     }
     return null;
   }
   catch {
     return null;
+  }
+};
+
+export const ensureTwitchExtension = async (event: H3Event) => {
+  const token = getHeader(event, "Authorization")?.replace("Bearer ", "");
+  const channelId = getHeader(event, "Channel-Id");
+
+  const payload = await validateTwitchExtension(event, token, channelId);
+
+  if (!payload) {
+    throw createError({
+      status: 400,
+      message: "Invalid authorization"
+    });
   }
 };

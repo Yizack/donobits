@@ -4,21 +4,35 @@ import { useInfiniteScroll } from "@vueuse/core";
 
 const twitch = useTwitch();
 
+const data = ref<Donobits[]>();
+const isLoading = ref(true);
+const volume = ref(100);
+const search = ref("");
+const perScroll = 6;
+const scrollCount = ref(0);
 const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
 const avatars = ref<Record<string, string>>({});
-
-const getViewerAvatar = (name: string) => avatars.value[name.toLowerCase()];
-
-const authorization = ref<Twitch.ext.Authorized | null>(null);
-const isAuthorized = ref(false);
-const errorText = ref<string | null>(null);
-const bitsProduct = shallowRef<Twitch.ext.BitsProduct | null>(null);
+const error = ref<string>("");
+const bitsProduct = ref<Twitch.ext.BitsProduct | null>(null);
 const bitsEnabled = ref(false);
-const purchasingId = ref<number | null>(null);
-const playingClipId = ref<number | null>(null);
-const volume = ref(100);
+const purchasingId = ref<string | null>(null);
+const playingClipId = ref<string | null>(null);
 
-const purchase = async (clipId: number) => {
+const audioClips = computed(() => data.value?.filter(clip => clip.type === "audio") ?? []);
+const filteredData = computed(() => {
+  const query = search.value.trim().toLowerCase();
+  const clips = audioClips.value;
+
+  if (!query) return clips;
+
+  return clips.filter(clip => clip.name.toLowerCase().includes(query));
+});
+
+const visibleAudioClips = computed(() => filteredData.value.slice(0, perScroll + (scrollCount.value * perScroll)));
+
+const getAvatar = (name: string) => avatars.value[name.toLowerCase()];
+
+const purchase = async (clipId: string) => {
   if (!bitsEnabled.value
     || !bitsProduct.value
     || !broadcaster.value
@@ -29,7 +43,7 @@ const purchase = async (clipId: number) => {
 
   if (!import.meta.dev && !await twitch.isLive(broadcaster.value.id)) {
     purchasingId.value = null;
-    errorText.value = `${broadcaster.value.displayName} is not live`;
+    error.value = `${broadcaster.value.displayName} is not live`;
     return;
   }
 
@@ -38,17 +52,24 @@ const purchase = async (clipId: number) => {
 
 onMounted(() => {
   volume.value = parseInt(localStorage.getItem("volume") ?? "100");
+  let extAuth: Twitch.ext.Authorized | null = null;
 
   Twitch.ext.onAuthorized(async (auth) => {
-    authorization.value = auth;
-    isAuthorized.value = true;
+    extAuth = auth;
     bitsEnabled.value = Twitch.ext.features.isBitsEnabled;
     twitch.init(auth.clientId);
 
-    errorText.value = null;
+    error.value = "";
 
     if (!broadcaster.value) {
       broadcaster.value = await twitch.getUserById(auth.channelId);
+
+      data.value = await getDonobits(broadcaster.value!, auth);
+      const viewerNames = audioClips.value.map(clip => clip.name);
+      if (viewerNames.length) {
+        avatars.value = await twitch.getAvatars(viewerNames);
+      }
+      isLoading.value = false;
     }
 
     Twitch.ext.bits.getProducts()
@@ -56,7 +77,7 @@ onMounted(() => {
         bitsProduct.value = products.find(product => SITE.twitch.extension.products.includes(product.sku)) ?? null;
       }).catch(() => {
         bitsProduct.value = null;
-        errorText.value = "Bits purchases are unavailable in this Twitch context";
+        error.value = "Bits purchases are unavailable in this Twitch context";
       });
   });
 
@@ -66,30 +87,36 @@ onMounted(() => {
 
   Twitch.ext.bits.onTransactionComplete((transaction) => {
     if (transaction.initiator !== "current_user"
-      || !authorization.value
+      || !extAuth
       || !SITE.twitch.extension.products.includes(transaction.product.sku)
       || purchasingId.value === null
       || !broadcaster.value
     ) return;
 
-    const clip = audioClips.value?.find(item => item.ID === purchasingId.value);
-    if (!clip) return;
+    const data = audioClips.value?.find(item => item.uuid === purchasingId.value);
+    if (!data) return;
 
-    extFetch(`/api/donoclip/${encodeURIComponent(broadcaster.value.name)}/queue`, {
+    extFetch(`/api/ebs/${broadcaster.value.name}/queue`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${authorization.value?.token}`
+        "Authorization": `Bearer ${extAuth.token}`,
+        "Channel-Id": extAuth.channelId
       },
       body: {
         transaction: {
           displayName: transaction.displayName,
           transactionReceipt: transaction.transactionReceipt
         },
-        avatar: getViewerAvatar(clip.ViewerName),
-        clip
-      }
-    }).catch((error) => {
-      console.error("Failed to queue clip:", error);
+        image: getAvatar(data.name),
+        data: {
+          uuid: data.uuid,
+          name: data.name,
+          type: data.type,
+          url: data.url
+        }
+      } satisfies DonobitsQueue
+    }).catch(() => {
+      error.value = "Failed to queue clip. Ask the broadcaster for assistance.";
     });
 
     purchasingId.value = null;
@@ -100,38 +127,8 @@ onMounted(() => {
   });
 });
 
-const broadcasterLogin = computed(() => broadcaster.value?.name);
-const { data, error, status, execute } = await useDonoclip(broadcasterLogin);
-
-const audioClips = computed(() => data.value?.filter(clip => clip.Type === "audio") ?? []);
-
-watch(broadcasterLogin, async (login, previousLogin) => {
-  if (!login || login === previousLogin) return;
-  await execute();
-});
-
-watch([isAuthorized, data], async () => {
-  const names = (audioClips.value ?? []).map(clip => clip.ViewerName.toLowerCase());
-  if (isAuthorized.value && names.length) {
-    avatars.value = await twitch.getAvatars(names);
-  }
-});
-
-const search = ref("");
-
-const filteredData = computed(() => {
-  const query = search.value.trim().toLowerCase();
-  const clips = audioClips.value;
-
-  if (!query) return clips;
-
-  return clips.filter(clip => clip.ViewerName.toLowerCase().includes(query));
-});
-
-const perScroll = 6;
-const scrollCount = ref(0);
-
 watch(search, () => {
+  playingClipId.value = null;
   scrollCount.value = 0;
   scrollTo(0, 0);
 });
@@ -141,8 +138,6 @@ watch(audioClips, () => {
     scrollCount.value++;
   }, { distance: 100 });
 });
-
-const visibleAudioClips = computed(() => filteredData.value.slice(0, perScroll + (scrollCount.value * perScroll)));
 
 watch(volume, (newVolume) => {
   localStorage.setItem("volume", newVolume.toString());
@@ -157,15 +152,15 @@ watch(volume, (newVolume) => {
     />
 
     <UAlert
-      v-if="errorText"
+      v-if="error"
       class="sticky top-16 z-50 shadow py-2"
       color="error"
-      :description="errorText"
+      :description="error"
       icon="pixelarticons:alert"
       :close="{
         class: 'invert',
         onClick: () => {
-          errorText = null
+          error = '';
         },
       }"
     />
@@ -177,11 +172,11 @@ watch(volume, (newVolume) => {
           <span v-else>Showing {{ filteredData.length }} of {{ audioClips?.length ?? 0 }} clips</span>
         </p>
 
-        <div v-if="status === 'idle' || status === 'pending'" class="grid gap-5 grid-cols-2 md:grid-cols-4">
+        <div v-if="isLoading" class="grid gap-5 grid-cols-2 md:grid-cols-4">
           <PanelClipSkeleton v-for="placeholder in 4" :key="placeholder" />
         </div>
 
-        <UCard v-else-if="error" variant="subtle" class="border-error/30">
+        <UCard v-else-if="!data" variant="subtle" class="border-error/30">
           <div class="flex items-start gap-3">
             <UIcon
               name="pixelarticons:alert"
@@ -189,38 +184,30 @@ watch(volume, (newVolume) => {
             />
             <div>
               <h2 class="font-semibold text-highlighted">Unable to load clips</h2>
-              <p class="mt-1 text-sm text-muted">
-                The clip library could not be loaded right now. Please try again
-                later.
-              </p>
+              <p class="mt-1 text-sm text-muted">The clip library could not be loaded right now. Please try again later.</p>
             </div>
           </div>
         </UCard>
 
-        <div
-          v-else-if="visibleAudioClips.length"
-          class="grid gap-5 grid-cols-2 md:grid-cols-4"
-        >
+        <div v-else-if="visibleAudioClips.length" class="grid gap-5 grid-cols-2 md:grid-cols-4">
           <PanelClip
-            v-for="clip in visibleAudioClips"
-            :key="clip.ID"
+            v-for="clip of visibleAudioClips"
+            :key="clip.uuid"
             v-model="playingClipId"
-            :clip="clip"
+            :data="clip"
             :price="bitsProduct?.cost.amount"
-            :image="getViewerAvatar(clip.ViewerName)"
+            :image="getAvatar(clip.name)"
             :disabled="!bitsEnabled || purchasingId !== null"
-            :loading="purchasingId === clip.ID"
+            :loading="purchasingId === clip.uuid"
             :volume="volume"
-            @click="purchase(clip.ID)"
+            @click="purchase(clip.uuid)"
           />
         </div>
 
         <UCard v-else variant="subtle">
           <div class="flex flex-col items-center justify-center px-4 py-12 text-center">
             <h2 class="font-semibold text-highlighted">No clips found</h2>
-            <p class="mt-1 max-w-sm text-sm text-muted">
-              Try a different user or clear the search to see all clips.
-            </p>
+            <p class="mt-1 max-w-sm text-sm text-muted">Try a different user or clear the search to see all clips.</p>
           </div>
         </UCard>
       </ClientOnly>

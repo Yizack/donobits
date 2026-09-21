@@ -1,19 +1,15 @@
-
 export default defineEventHandler(async (event) => {
   const body = await readValidatedBody(event, z.object({
     transaction: z.object({
       displayName: z.string(),
       transactionReceipt: z.string()
     }),
-    avatar: z.string().optional(),
-    clip: z.object({
-      ID: z.number(),
-      UUID: z.uuid(),
-      Type: z.enum(["audio", "video"]),
-      ViewerName: z.string(),
-      UploadedAt: z.number(),
-      ModDecision: z.number(),
-      AssetUrl: z.string()
+    image: z.string().optional(),
+    data: z.object({
+      uuid: z.uuid(),
+      type: z.enum(["audio", "video"]),
+      name: z.string(),
+      url: z.string()
     })
   }).parse);
 
@@ -51,9 +47,9 @@ export default defineEventHandler(async (event) => {
               }
             }
           },
-          avatar: body.avatar,
-          clip: body.clip
-        } satisfies DonobitsQueue
+          image: body.image,
+          data: body.data
+        } satisfies DonobitsQueued
       }));
     }
 
@@ -61,17 +57,7 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  const headers = getHeaders(event);
-  const token = headers.authorization?.replace("Bearer ", "");
-
-  const payload = await validateTwitchExtension(event, token);
-
-  if (!payload) {
-    throw createError({
-      status: 400,
-      message: "Invalid authorization"
-    });
-  }
+  await ensureTwitchExtension(event);
 
   const durableFetch = event.context.cloudflare?.durableFetch;
   if (!durableFetch) {
@@ -100,5 +86,5 @@ export default defineEventHandler(async (event) => {
 
   setResponseStatus(event, 202);
 
-  return { queued: true };
+  return { success: true };
 });
