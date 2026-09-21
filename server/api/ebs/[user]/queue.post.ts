@@ -13,9 +13,9 @@ export default defineEventHandler(async (event) => {
     })
   }).parse);
 
-  const txPayload = await validateTwitchTransaction(event, body.transaction);
+  const payload = await validateTwitchTransaction(event, body.transaction.transactionReceipt);
 
-  if (!txPayload) {
+  if (!payload) {
     throw createError({
       status: 400,
       message: "Invalid Twitch transaction"
@@ -42,8 +42,8 @@ export default defineEventHandler(async (event) => {
             displayName: body.transaction.displayName,
             product: {
               cost: {
-                amount: String(txPayload.data.product.cost.amount),
-                type: txPayload.data.product.cost.type
+                amount: String(payload.data.product.cost.amount),
+                type: payload.data.product.cost.type
               }
             }
           },

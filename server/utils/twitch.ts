@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import { jwtVerify } from "jose";
 import type { H3Event } from "h3";
 
-const parseTwitchTime = (value: string): Date => {
+const parseTwitchTime = (value: string) => {
   const match = value.match(
     /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2}(?:\.\d+)?) ([+-]\d{4})/
   );
@@ -19,25 +19,25 @@ const parseTwitchTime = (value: string): Date => {
     throw new Error("Invalid Twitch transaction timestamp");
   }
 
-  return result;
+  return result.getTime();
 };
 
 const TOLERANCE_MINUTES = 1;
 
 export const validateTwitchTransaction = async (
   event: H3Event,
-  transaction: Pick<Twitch.ext.BitsTransaction, "displayName" | "transactionReceipt">
+  receipt: Twitch.ext.BitsTransaction["transactionReceipt"]
 ) => {
   const config = useRuntimeConfig(event);
   const key = Buffer.from(config.twitch.extension.secret, "base64");
 
   try {
-    const { payload } = await jwtVerify<TwitchTransactionPayload>(transaction.transactionReceipt, key, {
+    const { payload } = await jwtVerify<TwitchTransactionPayload>(receipt, key, {
       algorithms: ["HS256"]
     });
 
-    const transactionTime = parseTwitchTime(payload.data.time);
-    const age = Date.now() - transactionTime.getTime();
+    const time = parseTwitchTime(payload.data.time);
+    const age = Date.now() - time;
 
     if (payload.topic === "bits_transaction_receipt"
       && payload.data.product.domainId === `twitch.ext.${config.twitch.extension.clientId}`
@@ -52,11 +52,10 @@ export const validateTwitchTransaction = async (
   }
 };
 
-const validateTwitchExtension = async (
-  event: H3Event,
-  token?: string,
-  channelId?: string
-) => {
+const validateTwitchExtension = async (event: H3Event) => {
+  const token = getHeader(event, "Authorization")?.replace("Bearer ", "");
+  const channelId = getHeader(event, "Channel-Id");
+
   if (!token || !channelId) return;
 
   const config = useRuntimeConfig(event);
@@ -79,10 +78,7 @@ const validateTwitchExtension = async (
 };
 
 export const ensureTwitchExtension = async (event: H3Event) => {
-  const token = getHeader(event, "Authorization")?.replace("Bearer ", "");
-  const channelId = getHeader(event, "Channel-Id");
-
-  const payload = await validateTwitchExtension(event, token, channelId);
+  const payload = await validateTwitchExtension(event);
 
   if (!payload) {
     throw createError({
