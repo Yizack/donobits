@@ -3,15 +3,17 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { ZipArchive } from "archiver";
 import { addServerHandler, createResolver, defineNuxtModule } from "nuxt/kit";
+import type { NuxtTwitchExtensionOptions } from "./types.ts";
 import type {} from "@nuxt/nitro-server/augments";
 
-export default defineNuxtModule({
+export default defineNuxtModule<NuxtTwitchExtensionOptions>({
   meta: {
     name: "twitch-extension",
     configKey: "twitchExtension"
   },
   defaults: {
     helperScript: "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js",
+    clientId: "",
     pages: {
       dirname: "extension",
       routes: ["panel", "config"]
@@ -111,14 +113,19 @@ export default defineNuxtModule({
       for (const page of options.pages.routes) {
         nuxt.options.routeRules[`/${page}.html`] = { proxy: `/${options.pages.dirname}/${page}` };
       }
-
     }
 
     // Production options
     if (nuxt.options.envName === "production") {
+      options.clientId ||= process.env.NUXT_TWITCH_EXTENSION_CLIENT_ID;
+
+      if (!options.clientId) {
+        throw new Error("Twitch Extension Client ID is required for production.");
+      }
+
       nuxt.options.routeRules["/api/ebs/**"] = {
         headers: {
-          "Access-Control-Allow-Origin": options.helperScript
+          "Access-Control-Allow-Origin": `https://${options.clientId}.ext-twitch.tv`
         }
       };
 

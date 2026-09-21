@@ -87,11 +87,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    twitch: {
-      extension: {
-        clientId: "",
-        secret: ""
-      }
+    twitchExtension: {
+      clientId: "",
+      secret: ""
     }
   },
 
