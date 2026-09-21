@@ -103,6 +103,13 @@ onMounted(async () => {
                   }"
                 />
                 link to your bookmarks bar.
+                <div class="text-xs text-muted mt-2 flex items-center gap-2">
+                  <UBadge label="TIP" size="sm" />
+                  <span>Show bookmarks bar with</span>
+                  <span>
+                    <UKbd value="meta" size="sm" />+<UKbd value="shift" size="sm" />+<UKbd value="b" size="sm" />
+                  </span>
+                </div>
               </li>
               <li>
                 Click
