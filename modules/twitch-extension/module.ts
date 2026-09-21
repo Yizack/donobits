@@ -2,7 +2,7 @@ import { createWriteStream } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { ZipArchive } from "archiver";
-import { addServerHandler, createResolver, defineNuxtModule } from "nuxt/kit";
+import { addServerHandler, createResolver, defineNuxtModule, hasNuxtModule } from "nuxt/kit";
 import type { ModuleOptions, NuxtTwitchExtensionOptions } from "./types.ts";
 import type {} from "@nuxt/nitro-server/augments";
 
@@ -25,6 +25,22 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       dirname: "ebs"
     }
   },
+  moduleDependencies (nuxt) {
+    if (nuxt.options.envName === "twitchExtension") {
+      if (hasNuxtModule("@nuxt/ui")) {
+        // @ts-expect-error Nuxt UI options
+        nuxt.options.ui ||= {};
+        // @ts-expect-error Nuxt UI Color Mode
+        nuxt.options.ui.colorMode = false;
+      }
+
+      if (hasNuxtModule("@nuxthub/core")) {
+        // @ts-expect-error Nuxt Hub options
+        nuxt.options.hub = false;
+      }
+    }
+    return {};
+  },
   setup (options, nuxt) {
     nuxt.options.routeRules ||= {};
     const extensionPages = ["config", ...options.type];
@@ -34,13 +50,6 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       nuxt.options.app.cdnURL = nuxt.options.runtimeConfig.app.cdnURL = "./";
       nuxt.options.app.head.script ||= [];
       nuxt.options.app.head.script.push({ src: options.helperScript });
-
-      // @ts-expect-error Nuxt Hub options
-      nuxt.options.hub = false;
-      // @ts-expect-error Nuxt UI options
-      nuxt.options.ui ||= {};
-      // @ts-expect-error Nuxt UI options
-      nuxt.options.ui.colorMode = false;
 
       nuxt.options.experimental.entryImportMap = false;
       nuxt.options.experimental.payloadExtraction = false;
