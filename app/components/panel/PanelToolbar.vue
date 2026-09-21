@@ -24,24 +24,22 @@ const volumeIcon = computed(() => {
   <UHeader
     class="sticky top-0"
     :toggle="false"
-    :ui="{ left: 'block! w-full', center: 'hidden!' }"
+    :ui="{ container: 'gap-2', left: 'block! w-full', right: 'flex-0!', center: 'hidden!' }"
   >
     <template #left>
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <label for="search" class="sr-only">
-          Search user...
-        </label>
-        <UInput
-          id="search"
-          v-model="search"
-          icon="pixelarticons:search"
-          type="search"
-          size="sm"
-          placeholder="Search user..."
-          class="w-full"
-          :loading="search !== debouncedSearch"
-        />
-      </div>
+      <label for="search" class="sr-only">
+        Search user...
+      </label>
+      <UInput
+        id="search"
+        v-model="search"
+        icon="pixelarticons:search"
+        type="search"
+        size="sm"
+        placeholder="Search user..."
+        class="w-full"
+        :loading="search !== debouncedSearch"
+      />
     </template>
 
     <template #right>
@@ -49,6 +47,7 @@ const volumeIcon = computed(() => {
         <UButton
           color="neutral"
           variant="outline"
+          size="sm"
           :icon="volumeIcon"
         />
         <template #content>
