@@ -95,7 +95,7 @@ onMounted(async () => {
                   label="Import Donoclip"
                   size="sm"
                   variant="outline"
-                  :to="donoclip.bookmarklet()"
+                  :to="donoclip.bookmarklet"
                   draggable="true"
                   color="neutral"
                   :ui="{
@@ -105,7 +105,7 @@ onMounted(async () => {
                 link to your bookmarks bar.
               </li>
               <li>
-                Open your
+                Click
                 <UButton size="sm" variant="subtle" label="Donoclip Inbox" @click="donoclip.open()" />
                 to access your Donoclip inbox.
               </li>
