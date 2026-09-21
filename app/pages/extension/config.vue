@@ -1,46 +1,40 @@
 <script setup lang="ts">
 import type { HelixUser } from "@twurple/api";
 
-const form = ref({
-  donoclip: ""
-});
-
 const twitch = useTwitch();
 
 const data = ref<Donobits[]>();
 const isLoading = ref(true);
 const extAuth = ref<Twitch.ext.Authorized | null>(null);
 const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
-
 const isImporting = ref(false);
 const showDonoclipInstructions = ref(false);
 const error = ref("");
 
-const importDonoclip = (broadcaster: ExcludeFn<HelixUser>, extAuth: Twitch.ext.Authorized) => {
-  if (!form.value.donoclip) {
-    error.value = "Content cannot be empty";
-    return;
-  }
-
+const importDonoclip = async (content: string) => {
   isImporting.value = true;
 
-  extFetch(`/api/ebs/${broadcaster.name}/import/donoclip`, {
+  extFetch(`/api/ebs/${broadcaster.value!.name}/import/donoclip`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${extAuth.token}`,
-      "Channel-Id": extAuth.channelId
+      "Authorization": `Bearer ${extAuth.value!.token}`,
+      "Channel-Id": extAuth.value!.channelId
     },
-    body: form.value.donoclip
+    body: content
   }).then(async () => {
-    data.value = await getDonobits(broadcaster, extAuth);
-    form.value.donoclip = "";
+    data.value = await getDonobits(broadcaster.value!, extAuth.value!);
     showDonoclipInstructions.value = false;
-  }).catch((error) => {
+  }).catch(() => {
     error.value = "Failed to import donoclip content";
-  }).finally(async () => {
+  }).finally(() => {
     isImporting.value = false;
   });
 };
+
+const donoclip = useDonoclip({
+  broadcaster: broadcaster,
+  extAuth: extAuth
+}, importDonoclip);
 
 onMounted(async () => {
   Twitch.ext.onAuthorized(async (auth) => {
@@ -56,14 +50,6 @@ onMounted(async () => {
     }
   });
 });
-
-const donoclipSnippet = [
-  "const inbox = await fetch(\"\");",
-  "const html = await inbox.text();",
-  "const match = html.match(/const clipData = JSON\\.parse\\((\"(?:\\\\.|[^\"\\\\])*\")\\)/);",
-  "const data = JSON.parse(match[1]);",
-  "console.log(data);"
-].join("\n");
 </script>
 
 <template>
@@ -99,20 +85,34 @@ const donoclipSnippet = [
           close
           @update:open="(open) => { if (!open) error = '' }"
         />
-        <form v-if="!data || showDonoclipInstructions" class="space-y-2" @submit.prevent="importDonoclip(broadcaster, extAuth)">
+        <form v-if="!data || showDonoclipInstructions" class="space-y-2">
           <p>Import content from donoclip.com</p>
           <div>
-            <ol class="list-decimal list-inside">
-              <li>Go to <ULink :href="`https://www.donoclip.com/${broadcaster.name}/inbox`" target="_blank" class="underline">https://www.donoclip.com/{{ broadcaster.name }}/inbox</ULink></li>
-              <li>Open the console in your browser by pressing F12</li>
-              <li>Paste the following command:<ProsePre language="js">{{ donoclipSnippet }}</ProsePre></li>
-              <li>Copy the output from the console and paste it into the field below.</li>
+            <ol class="list-decimal list-inside space-y-2">
+              <li>
+                Drag this
+                <UButton
+                  label="Import Donoclip"
+                  size="sm"
+                  variant="outline"
+                  :to="donoclip.bookmarklet()"
+                  draggable="true"
+                  color="neutral"
+                  :ui="{
+                    base: 'ring-0 outline-2 outline-dashed',
+                  }"
+                />
+                link to your bookmarks bar.
+              </li>
+              <li>
+                Open your
+                <UButton size="sm" variant="subtle" label="Donoclip Inbox" @click="donoclip.open()" />
+                to access your Donoclip inbox.
+              </li>
+              <li>Click the "Import Donoclip" bookmark in the Donoclip tab to import your content.</li>
+              <li>Done! Delete the bookmark if you no longer need it.</li>
             </ol>
           </div>
-          <UFormField>
-            <UTextarea v-model="form.donoclip" placeholder="Enter your donoclip content here" class="w-full" />
-          </UFormField>
-          <UButton type="submit" label="Import" size="lg" :loading="isImporting" block />
           <UButton v-if="data" color="error" label="Cancel" size="lg" block @click="showDonoclipInstructions = false" />
         </form>
       </div>
