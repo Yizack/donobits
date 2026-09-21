@@ -29,7 +29,7 @@ export const validateTwitchTransaction = async (
   receipt: Twitch.ext.BitsTransaction["transactionReceipt"]
 ) => {
   const config = useRuntimeConfig(event);
-  const key = Buffer.from(config.twitch.extension.secret, "base64");
+  const key = Buffer.from(config.twitchExtension.secret, "base64");
 
   try {
     const { payload } = await jwtVerify<TwitchTransactionPayload>(receipt, key, {
@@ -40,7 +40,7 @@ export const validateTwitchTransaction = async (
     const age = Date.now() - time;
 
     if (payload.topic === "bits_transaction_receipt"
-      && payload.data.product.domainId === `twitch.ext.${config.twitch.extension.clientId}`
+      && payload.data.product.domainId === `twitch.ext.${config.twitchExtension.clientId}`
       && payload.data.product.cost.type === "bits"
       && age < TOLERANCE_MINUTES * 60 * 1000
     ) {
@@ -59,7 +59,7 @@ const validateTwitchExtension = async (event: H3Event) => {
   if (!token || !channelId) return;
 
   const config = useRuntimeConfig(event);
-  const key = Buffer.from(config.twitch.extension.secret, "base64");
+  const key = Buffer.from(config.twitchExtension.secret, "base64");
 
   try {
     const { payload } = await jwtVerify<TwitchExtensionPayload>(token, key, {
