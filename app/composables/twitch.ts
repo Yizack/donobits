@@ -17,7 +17,7 @@ export const useTwitch = () => {
   };
 
   const getAvatars = async (names: string[]): Promise<Record<string, string>> => {
-    const logins = [...new Set(names)];
+    const logins = [...new Set(names.map(name => name.toLowerCase()))];
 
     if (!logins.length) return {};
 
