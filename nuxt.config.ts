@@ -1,8 +1,8 @@
 import icons from "./app/icons.ts";
-import { SITE } from "./shared/utils/site.ts";
 
 export default defineNuxtConfig({
   modules: [
+    "./modules/twitch-extension",
     "@nuxt/ui",
     "@nuxt/icon",
     "nuxt-ui-colors-no-inline",
@@ -10,65 +10,15 @@ export default defineNuxtConfig({
   ],
 
   $development: {
-    app: {
-      head: {
-        script: [
-          { src: SITE.twitch.extension.helper }
-        ]
-      }
-    },
-
     ui: {
       prose: true
-    },
-
-    routeRules: {
-      "/panel.html": { proxy: "/extension/panel" },
-      "/config.html": { proxy: "/extension/config" }
     }
   },
 
   $env: {
     twitch: {
-      modules: [
-        "./modules/twitch/bundle-extension"
-      ],
-
       ui: {
-        colorMode: false,
         prose: true
-      },
-
-      app: {
-        cdnURL: "./",
-        head: {
-          htmlAttrs: {
-            class: "dark"
-          },
-          script: [
-            { src: SITE.twitch.extension.helper }
-          ]
-        }
-      },
-
-      routeRules: {
-        "/panel": { proxy: "/extension/panel" },
-        "/config": { proxy: "/extension/config" }
-      },
-
-      hub: false,
-
-      experimental: {
-        entryImportMap: false,
-        payloadExtraction: false,
-        renderJsonPayloads: false
-      },
-
-      nitro: {
-        prerender: {
-          routes: ["/panel", "/config"],
-          ignore: ["/200.html", "/404.html"]
-        }
       },
 
       vite: {
@@ -141,14 +91,6 @@ export default defineNuxtConfig({
       extension: {
         clientId: "",
         secret: ""
-      }
-    }
-  },
-
-  routeRules: {
-    "/api/ebs/**": {
-      headers: {
-        "Access-Control-Allow-Origin": SITE.twitch.extension.host
       }
     }
   },

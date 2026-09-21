@@ -1,3 +1,5 @@
+import { defineEventHandler, sendNoContent, setHeaders } from "h3";
+
 export default defineEventHandler((event) => {
   if (event.method !== "OPTIONS" || !event.path.startsWith("/api/ebs/")) return;
 
