@@ -31,7 +31,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
 
     // Twitch options
     if (nuxt.options.envName === "twitchExtension") {
-      nuxt.options.app.cdnURL = "./";
+      nuxt.options.app.cdnURL = nuxt.options.runtimeConfig.app.cdnURL = "./";
       nuxt.options.app.head.script ||= [];
       nuxt.options.app.head.script.push({ src: options.helperScript });
 
