@@ -22,7 +22,7 @@ export const useTwitch = () => {
     if (!logins.length) return {};
 
     const userProfiles = await Promise.all(
-      logins.map(twitch.users.getUserByNameBatched)
+      logins.map(login => twitch.users.getUserByNameBatched(login))
     );
 
     return Object.fromEntries(
