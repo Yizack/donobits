@@ -16,28 +16,9 @@ export default defineNuxtConfig({
   },
 
   $env: {
-    twitch: {
+    twitchExtension: {
       ui: {
         prose: true
-      },
-
-      vite: {
-        $client: {
-          build: {
-            rolldownOptions: {
-              output: {
-                codeSplitting: {
-                  groups: [
-                    {
-                      name: "vendor",
-                      test: /node_modules[\\/]/
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
       }
     }
   },

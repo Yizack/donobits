@@ -1,3 +1,4 @@
+type TwitchExtensionType = "panel" | "mobile" | "video_overlay" | "video_component";
 
 export interface NuxtTwitchExtensionOptions {
   /**
@@ -8,17 +9,19 @@ export interface NuxtTwitchExtensionOptions {
    * Twitch Extension Client ID
    */
   clientId?: string;
+  /**
+   * Type of Extension. This configuration will also determine which pages are generated for the extension.
+   *
+   * Available type values are `panel`, `mobile`, `video_overlay`, `video_component`
+   * @default ["panel"]
+   */
+  type: TwitchExtensionType[];
   pages: {
     /**
      * Name of the page directory containing the extension pages
      * @default "extension"
      */
     dirname: string;
-    /**
-     * Routes for the extension pages
-     * @default ["panel", "config"]
-     */
-    routes: string[];
   };
   ebs: {
     /**

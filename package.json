@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "build:extension": "nuxt generate --envName=twitch",
+    "build:extension": "nuxt generate --envName=twitchExtension",
     "dev": "nuxt dev --port=5173 --public",
     "generate": "nuxt generate",
     "preview": "wrangler dev",
