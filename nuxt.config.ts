@@ -17,6 +17,14 @@ export default defineNuxtConfig({
 
   $env: {
     twitchExtension: {
+      app: {
+        head: {
+          htmlAttrs: {
+            class: "dark"
+          }
+        }
+      },
+
       ui: {
         prose: true
       }
