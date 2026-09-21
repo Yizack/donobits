@@ -46,11 +46,9 @@ export const validateTwitchTransaction = async (
     ) {
       return payload;
     }
-
-    return null;
   }
   catch {
-    return null;
+    return;
   }
 };
 
@@ -59,7 +57,7 @@ const validateTwitchExtension = async (
   token?: string,
   channelId?: string
 ) => {
-  if (!token || !channelId) return null;
+  if (!token || !channelId) return;
 
   const config = useRuntimeConfig(event);
   const key = Buffer.from(config.twitch.extension.secret, "base64");
@@ -74,10 +72,9 @@ const validateTwitchExtension = async (
     ) {
       return payload;
     }
-    return null;
   }
   catch {
-    return null;
+    return;
   }
 };
 
