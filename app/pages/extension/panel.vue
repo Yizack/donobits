@@ -10,6 +10,7 @@ const volume = ref(100);
 const search = ref("");
 const perScroll = 6;
 const scrollCount = ref(0);
+const hasScrolled = ref(false);
 const broadcaster = ref<ExcludeFn<HelixUser> | null>(null);
 const avatars = ref<Record<string, string>>({});
 const error = ref<string>("");
@@ -133,14 +134,18 @@ watch(search, () => {
   scrollTo(0, 0);
 });
 
-watch(audioClips, () => {
-  useInfiniteScroll(document, () => {
-    scrollCount.value++;
-  }, { distance: 100 });
-});
-
 watch(volume, (newVolume) => {
   localStorage.setItem("volume", newVolume.toString());
+});
+
+useInfiniteScroll(document, () => {
+  scrollCount.value++;
+}, {
+  distance: 100,
+  onScroll: () => {
+    hasScrolled.value = window.scrollY > 0;
+  },
+  canLoadMore: () => hasScrolled.value
 });
 </script>
 
