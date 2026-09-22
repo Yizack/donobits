@@ -16,7 +16,6 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
   defaults: {
     helperScript: "https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js",
     clientId: "",
-    type: ["panel"],
     filename: "extension.zip",
     pages: {
       dirname: "extension"
@@ -43,7 +42,17 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
   },
   setup (options, nuxt) {
     nuxt.options.routeRules ||= {};
-    const extensionPages = ["config", ...options.type];
+    const extensionBuildPaths: string[] = [];
+    const extensionPages: string[] = [];
+
+    nuxt.hook("pages:extend", (pages) => {
+      extensionBuildPaths.push(
+        ...pages.filter(page => page.path.startsWith(`/${options.pages.dirname}/`)).map(page => page.path)
+      );
+      extensionPages.push(
+        ...extensionBuildPaths.map(path => path.split(`/${options.pages.dirname}/`)[1])
+      );
+    });
 
     // Twitch options
     if (nuxt.options.envName === "twitchExtension") {
@@ -55,15 +64,24 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       nuxt.options.experimental.payloadExtraction = false;
       nuxt.options.experimental.renderJsonPayloads = false;
 
-      for (const page of extensionPages) {
-        nuxt.options.routeRules[`/${page}`] = { proxy: `/${options.pages.dirname}/${page}` };
-      }
-
       nuxt.options.nitro.prerender ||= {};
-      nuxt.options.nitro.prerender.routes ||= [];
-      nuxt.options.nitro.prerender.routes.push(...extensionPages.map(page => `/${page}`));
       nuxt.options.nitro.prerender.ignore ||= [];
       nuxt.options.nitro.prerender.ignore.push("/200.html", "/404.html");
+
+      nuxt.hook("pages:extend", (pages) => {
+        nuxt.options.routeRules ||= {};
+        for (const page of extensionPages) {
+          nuxt.options.routeRules[`/${page}`] = { proxy: `/${options.pages.dirname}/${page}` };
+        }
+
+        nuxt.options.nitro.prerender ||= {};
+        nuxt.options.nitro.prerender.routes ||= [];
+        nuxt.options.nitro.prerender.routes.push(...extensionPages.map(page => `/${page}`));
+
+        pages.splice(0, pages.length,
+          ...pages.filter(page => extensionBuildPaths.includes(page.path))
+        );
+      });
 
       nuxt.options.vite ||= {};
       nuxt.options.vite.build ||= {};
@@ -73,14 +91,6 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
           groups: [{ name: "vendor", test: /node_modules[\\/]/ }]
         }
       };
-
-      nuxt.hook("pages:extend", (pages) => {
-        const buildPages = extensionPages.map(page => `/${options.pages.dirname}/${page}`);
-
-        pages.splice(0, pages.length,
-          ...pages.filter(page => buildPages.includes(page.path))
-        );
-      });
 
       nuxt.hook("nitro:build:public-assets", async (nitro) => {
         const files = extensionPages.map(page => page + ".html");
