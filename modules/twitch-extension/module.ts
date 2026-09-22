@@ -45,7 +45,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
     const extensionBuildPaths: string[] = [];
     const extensionPages: string[] = [];
 
-    nuxt.hook("pages:extend", (pages) => {
+    nuxt.hooks.hookOnce("pages:extend", (pages) => {
       extensionBuildPaths.push(
         ...pages.filter(page => page.path.startsWith(`/${options.pages.dirname}/`)).map(page => page.path)
       );
@@ -68,7 +68,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       nuxt.options.nitro.prerender.ignore ||= [];
       nuxt.options.nitro.prerender.ignore.push("/200.html", "/404.html");
 
-      nuxt.hook("pages:extend", (pages) => {
+      nuxt.hooks.hookOnce("pages:extend", (pages) => {
         nuxt.options.routeRules ||= {};
         for (const page of extensionPages) {
           nuxt.options.routeRules[`/${page}`] = { proxy: `/${options.pages.dirname}/${page}` };
@@ -169,7 +169,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       });
 
       // In production, extend the pages to exclude the ones that are part of the Twitch extension.
-      nuxt.hook("pages:extend", (pages) => {
+      nuxt.hooks.hookOnce("pages:extend", (pages) => {
         pages.splice(0, pages.length,
           ...pages.filter(page => !extensionPages.map(page => `/${options.pages.dirname}/${page}`).includes(page.path))
         );
