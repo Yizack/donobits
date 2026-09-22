@@ -35,8 +35,8 @@ Twitch extension that allows your community to redeem recorded sounds with Bits 
 
 ### Twitch Extension config
 
-![Twitch Extension config view](https://github.com/user-attachments/assets/1d465fbf-af5b-490e-bbb7-7d08b630db2a)
+![Twitch Extension config view](https://github.com/user-attachments/assets/d1a712fa-7cb5-4dcc-9732-629e83adac0b)
 
 ### Imported donoclip content
 
-![Twitch Extension showing imported donoclip content](https://github.com/user-attachments/assets/20d8668d-8a56-4266-bb59-4f1701c733f0)
+![Twitch Extension showing imported donoclip content](https://github.com/user-attachments/assets/4e5ba474-8be0-4c21-a765-4c9d2fb77d53)
