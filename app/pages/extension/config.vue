@@ -92,6 +92,7 @@ onMounted(async () => {
                   Drag this
                   <UButton
                     label="Import Donoclip"
+                    class="cursor-grab"
                     size="sm"
                     variant="outline"
                     :to="donoclip.bookmarklet"
@@ -103,7 +104,7 @@ onMounted(async () => {
                   />
                   link to your bookmarks bar.
                   <div class="text-xs text-muted mt-2 flex items-center gap-2">
-                    <UBadge label="TIP" size="sm" />
+                    <UBadge label="TIP" variant="subtle" size="sm" />
                     <span>Show bookmarks bar with</span>
                     <span>
                       <UKbd value="meta" size="sm" />+<UKbd value="shift" size="sm" />+<UKbd value="b" size="sm" />
@@ -112,7 +113,7 @@ onMounted(async () => {
                 </li>
                 <li>
                   Click
-                  <UButton size="sm" variant="subtle" label="Donoclip Inbox" @click="donoclip.open()" />
+                  <UButton size="sm" label="Donoclip Inbox" @click="donoclip.open()" />
                   to access your Donoclip inbox.
                 </li>
                 <li>Click the "Import Donoclip" bookmark in the Donoclip tab to import your content.</li>
