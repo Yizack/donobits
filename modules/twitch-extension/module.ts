@@ -142,9 +142,12 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       nuxt.options.app.head.script.push({ src: options.helperScript });
 
       // Set up .html route rules for the Twitch extension local testing
-      for (const page of extensionPages) {
-        nuxt.options.routeRules[`/${page}.html`] = { proxy: `/${options.pages.dirname}/${page}` };
-      }
+      nuxt.hook("pages:extend", () => {
+        const routeRules = useNitro().options.routeRules;
+        for (const page of extensionPages) {
+          routeRules[`/${page}.html`] = { proxy: { to: `/${options.pages.dirname}/${page}` } };
+        }
+      });
     }
 
     // Production options
