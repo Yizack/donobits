@@ -172,7 +172,7 @@ export default defineNuxtModule<NuxtTwitchExtensionOptions>({
       });
 
       // In production, extend the pages to exclude the ones that are part of the Twitch extension.
-      nuxt.hooks.hookOnce("pages:extend", (pages) => {
+      nuxt.hook("pages:extend", (pages) => {
         pages.splice(0, pages.length,
           ...pages.filter(page => !extensionPages.map(page => `/${options.pages.dirname}/${page}`).includes(page.path))
         );
