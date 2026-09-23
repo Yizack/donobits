@@ -1,8 +1,9 @@
+import { SITE } from "./shared/utils/site.ts";
 import icons from "./app/icons.ts";
 
 export default defineNuxtConfig({
   modules: [
-    "./modules/twitch-extension",
+    "nuxt-twitch-ext",
     "@nuxt/ui",
     "@nuxt/icon",
     "nuxt-ui-colors-no-inline",
@@ -16,7 +17,7 @@ export default defineNuxtConfig({
   },
 
   $env: {
-    twitchExtension: {
+    twitchExt: {
       app: {
         head: {
           htmlAttrs: {
@@ -76,9 +77,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    twitchExtension: {
+    twitchExt: {
       clientId: "",
-      secret: ""
+      secretKey: ""
     }
   },
 
@@ -103,6 +104,12 @@ export default defineNuxtConfig({
     blob: true
   },
 
+  fonts: {
+    defaults: {
+      subsets: ["latin"]
+    }
+  },
+
   icon: {
     mode: "css",
     provider: "none",
@@ -112,5 +119,15 @@ export default defineNuxtConfig({
     customCollections: [
       { prefix: "twitch", dir: "./app/assets/icons" }
     ]
+  },
+
+  twitchExt: {
+    ebs: {
+      baseURL: SITE.host,
+      preflight: {
+        allowMethods: ["GET", "POST"],
+        allowHeaders: ["Content-Type", "Authorization", "Client-Id"]
+      }
+    }
   }
 });

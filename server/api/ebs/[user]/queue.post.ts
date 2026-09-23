@@ -13,9 +13,12 @@ export default defineEventHandler(async (event) => {
     })
   }).parse);
 
-  const payload = await validateTwitchTransaction(event, body.transaction.transactionReceipt);
+  const payload = await verifyTwitchTransaction(event, body.transaction.transactionReceipt);
+  const TOLERANCE_MINUTES = 1;
 
-  if (!payload) {
+  if (!payload
+    || Math.abs(Date.now() - parseTwitchTime(payload.data.time)) >= TOLERANCE_MINUTES * 60 * 1000
+  ) {
     throw createError({
       status: StatusCode.BAD_REQUEST,
       message: "Invalid Twitch transaction"
