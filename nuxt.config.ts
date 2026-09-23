@@ -126,7 +126,7 @@ export default defineNuxtConfig({
       baseURL: SITE.host,
       preflight: {
         allowMethods: ["GET", "POST"],
-        allowHeaders: ["Content-Type", "Authorization", "Client-Id"]
+        allowHeaders: ["Content-Type", "Authorization", "Channel-Id"]
       }
     }
   }
