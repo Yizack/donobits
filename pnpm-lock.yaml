@@ -170,10 +170,10 @@ importers:
         specifier: ^1.2.9
         version: 1.2.9
       '@nuxt/icon':
-        specifier: ^2.5.0
+        specifier: ^2.5.1
         version: 2.5.1(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)))(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2))(vue@3.5.43(typescript@6.0.3))
       '@nuxt/ui':
-        specifier: ^4.11.0
+        specifier: ^4.11.2
         version: 4.11.2(5a07e662dc9f3214266df4b6f2638a7c)
       '@nuxthub/core':
         specifier: ^0.10.8
@@ -197,20 +197,20 @@ importers:
         specifier: 0.1.1
         version: 0.1.1(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)))
       sass-embedded:
-        specifier: ^1.103.1
+        specifier: ^1.105.0
         version: 1.105.0
       wavesurfer.js:
-        specifier: ^7.12.12
-        version: 7.12.12
+        specifier: ^8.0.0
+        version: 8.0.0
       zod:
         specifier: ^4.6.5
         version: 4.6.5
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: ^4.20260702.1
-        version: 4.20260702.1
+        specifier: ^5.20260923.1
+        version: 5.20260923.1
       '@types/node':
-        specifier: ^26.6.1
+        specifier: ^26.6.2
         version: 26.6.2
       '@yizack/eslint-config':
         specifier: ^0.0.6
@@ -219,7 +219,7 @@ importers:
         specifier: ^0.0.6
         version: 0.0.6(0ab1136cd48eb38f0b9a71db4db13534)
       stylelint:
-        specifier: ^17.14.1
+        specifier: ^17.15.0
         version: 17.15.0(supports-color@10.2.2)(typescript@6.0.3)
       stylelint-config-standard-scss:
         specifier: ^17.0.0
@@ -231,8 +231,8 @@ importers:
         specifier: ^3.3.11
         version: 3.3.11(typescript@6.0.3)
       wrangler:
-        specifier: ^4.133.0
-        version: 4.137.0(@cloudflare/workers-types@4.20260702.1)(@types/node@26.6.2)
+        specifier: ^4.137.0
+        version: 4.137.0(@cloudflare/workers-types@5.20260923.1)(@types/node@26.6.2)
 
 packages:
 
@@ -445,6 +445,9 @@ packages:
 
   '@cloudflare/workers-types@4.20260702.1':
     resolution: {integrity: sha512-mOhf5TUEB1m2vPrxtqoIGfz0fUC9xyxRDx5gWHy5s+OCo6dcV+g7wI1R7gYCMFohhqF/2y2xeKVwMwCJjfn/WA==}
+
+  '@cloudflare/workers-types@5.20260923.1':
+    resolution: {integrity: sha512-zuOqyxfhzhN2LlxxcpnAS79aGVm9ku3ZcWKyvVLHyjPV6oHsuHSFidzSHhHE9ho9UTcUxU1IdtpdVuFXluKB+g==}
 
   '@colordx/core@5.8.0':
     resolution: {integrity: sha512-cG0QJAO6VkaRUlIb0zOzX9gfJgs1pjoOL9gZ/PK1kfvBs0GCkADu5oQh6gPxXgQnZ3gV575h+lQRC0NlMDTclA==}
@@ -6162,8 +6165,8 @@ packages:
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
-  wavesurfer.js@7.12.12:
-    resolution: {integrity: sha512-fyKNuREQTliCl4b9w7pUzpFXQIkX5tcdYu1o6vBdH+NlUXvTxshvfbG2hj8OxDevzQNZlDTHzZGyAT3FhuutWw==}
+  wavesurfer.js@8.0.0:
+    resolution: {integrity: sha512-xvtlehwRjKim7cgr9O5fc0hweYFlnch7A5l7i2qsJWODf7s1E2ZFjHOMHOuz1/Q0LXmgR6et5I2KlFgtke4avw==}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -6553,6 +6556,8 @@ snapshots:
     optional: true
 
   '@cloudflare/workers-types@4.20260702.1': {}
+
+  '@cloudflare/workers-types@5.20260923.1': {}
 
   '@colordx/core@5.8.0': {}
 
@@ -12675,7 +12680,7 @@ snapshots:
 
   w3c-keyname@2.2.8: {}
 
-  wavesurfer.js@7.12.12: {}
+  wavesurfer.js@8.0.0: {}
 
   webidl-conversions@3.0.1: {}
 
@@ -12710,7 +12715,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260921.1
       '@cloudflare/workerd-windows-64': 1.20260921.1
 
-  wrangler@4.137.0(@cloudflare/workers-types@4.20260702.1)(@types/node@26.6.2):
+  wrangler@4.137.0(@cloudflare/workers-types@5.20260923.1)(@types/node@26.6.2):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20260921.1)
@@ -12721,7 +12726,7 @@ snapshots:
       unenv: 2.0.0-rc.24
       workerd: 1.20260921.1
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20260702.1
+      '@cloudflare/workers-types': 5.20260923.1
       fsevents: 2.3.3
     transitivePeerDependencies:
       - '@types/node'
