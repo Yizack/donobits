@@ -194,8 +194,8 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7(supports-color@10.2.2)))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7(supports-color@10.2.2)))(@oxc-project/types@0.151.0)(@parcel/watcher@2.6.0)(@types/node@26.6.2)(@vue/compiler-sfc@3.5.43)(cac@6.7.14)(db0@0.3.4)(esbuild@0.28.2)(eslint@10.11.0(jiti@2.7.0)(supports-color@10.2.2))(ioredis@5.11.1(supports-color@10.2.2))(lightningcss@1.33.0)(magicast@0.5.5)(meow@14.1.0)(optionator@0.9.4)(rolldown@1.2.10)(rollup-plugin-visualizer@7.1.1(rolldown@1.2.10)(rollup@4.63.4))(rollup@4.63.4)(sass-embedded@1.105.0)(sass@1.105.0)(srvx@0.11.22)(stylelint@17.15.0(supports-color@10.2.2)(typescript@6.0.3))(supports-color@10.2.2)(terser@5.51.2)(typescript@6.0.3)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2))(vue-tsc@3.3.11(typescript@6.0.3))
       nuxt-twitch-ext:
-        specifier: 0.2.3
-        version: 0.2.3(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)))
+        specifier: 0.2.4
+        version: 0.2.4(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)))
       sass-embedded:
         specifier: ^1.105.0
         version: 1.105.0
@@ -4627,8 +4627,8 @@ packages:
   nth-check@2.1.1:
     resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
-  nuxt-twitch-ext@0.2.3:
-    resolution: {integrity: sha512-o+jYPKKXfHsJa3yrKWWVZCiz4gf1zcnh4IWVhB/78FtHE87Y9xUfie3HdOIjeFIMh0GMCNfPOE1kj5hWhYVTsg==}
+  nuxt-twitch-ext@0.2.4:
+    resolution: {integrity: sha512-PvI5fqLu3VzD4r7urYQVKMGPHHl0DKz9XoayQeCtyw2PTLj5Jt9Lx/vmeng4op/EVhK9TVrOuF7EHSg9FUAmgg==}
     hasBin: true
 
   nuxt-ui-colors-no-inline@0.0.6:
@@ -10823,7 +10823,7 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nuxt-twitch-ext@0.2.3(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2))):
+  nuxt-twitch-ext@0.2.4(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2))):
     dependencies:
       '@nuxt/kit': 4.5.2(magic-string@1.4.2)(magicast@0.5.5)(rolldown@1.2.10)(unplugin@3.4.0(esbuild@0.28.2)(rolldown@1.2.10)(rollup@4.63.4)(vite@8.3.0(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.7.0)(sass-embedded@1.105.0)(sass@1.105.0)(terser@5.51.2)))
       '@types/twitch-ext': 1.24.9

@@ -31,7 +31,7 @@
     "@twurple/auth-ext": "^8.2.0",
     "@vueuse/core": "^15.0.0",
     "nuxt": "^4.5.2",
-    "nuxt-twitch-ext": "0.2.3",
+    "nuxt-twitch-ext": "0.2.4",
     "sass-embedded": "^1.105.0",
     "wavesurfer.js": "^8.0.0",
     "zod": "^4.6.5"
