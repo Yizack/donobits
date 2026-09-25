@@ -100,7 +100,6 @@ onMounted(() => {
     extFetch(`/api/ebs/${broadcaster.value.name}/queue`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${extAuth.token}`,
         "Channel-Id": extAuth.channelId
       },
       body: {

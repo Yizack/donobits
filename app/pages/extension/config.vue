@@ -17,7 +17,6 @@ const importDonoclip = async (content: string) => {
   extFetch(`/api/ebs/${broadcaster.value!.name}/import/donoclip`, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${extAuth.value!.token}`,
       "Channel-Id": extAuth.value!.channelId
     },
     body: content
